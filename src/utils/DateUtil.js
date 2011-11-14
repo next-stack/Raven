@@ -8,15 +8,15 @@
 	
 	// Public
 	/** The string names of the days. */
-	DateUtil.days			= ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+	DateUtil.days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 	/** The string names of the months. */
-	DateUtil.months			= ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+	DateUtil.months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 	/** Milliseconds per minute. */
-	DateUtil.MS_PER_MINUTE	= 60000;
+	DateUtil.MS_PER_MINUTE = 60000;
 	/** Milliseconds per hour. */
-	DateUtil.MS_PER_HOUR	= 3600000;
+	DateUtil.MS_PER_HOUR = 3600000;
 	/** Milliseconds per day. */
-	DateUtil.MS_PER_DAY		= 86400000;
+	DateUtil.MS_PER_DAY = 86400000;
 	
 	/**
 	 * Updates the global time object.

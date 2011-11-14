@@ -6,26 +6,26 @@
 	}
 	
 	// Public
-	DateObject.prototype.seconds		= -1;
-	DateObject.prototype.minutes		= -1;
-	DateObject.prototype.hours			= -1;
-	DateObject.prototype.date			= -1;
-	DateObject.prototype.day			= -1;
-	DateObject.prototype.month			= -1;
-	DateObject.prototype.year			= -1;
-	DateObject.prototype.milliseconds	= -1;
+	DateObject.prototype.seconds = -1;
+	DateObject.prototype.minutes = -1;
+	DateObject.prototype.hours = -1;
+	DateObject.prototype.date = -1;
+	DateObject.prototype.day = -1;
+	DateObject.prototype.month = -1;
+	DateObject.prototype.year = -1;
+	DateObject.prototype.milliseconds = -1;
 	
 	DateObject.prototype.update = function( dateInstance ) {
 		var d = new Date();
 		if( dateInstance != undefined ) d = dateInstance;
-		this.seconds		= d.getSeconds();
-		this.minutes		= d.getMinutes();
-		this.hours			= d.getHours();
-		this.day			= d.getDay();
-		this.date			= d.getDate();
-		this.month			= d.getMonth();
-		this.year			= d.getFullYear();
-		this.milliseconds	= d.getMilliseconds();
+		this.seconds = d.getSeconds();
+		this.minutes = d.getMinutes();
+		this.hours = d.getHours();
+		this.day = d.getDay();
+		this.date = d.getDate();
+		this.month = d.getMonth();
+		this.year = d.getFullYear();
+		this.milliseconds = d.getMilliseconds();
 		return this;
 	}
 	

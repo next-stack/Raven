@@ -5,12 +5,12 @@
 	}
 	
 	// Public
-	Interpolation.prototype.speed		= 0.5;
-	Interpolation.prototype.spring		= 0.5;
-	Interpolation.prototype.target		= 1;
-	Interpolation.prototype.value		= 0;
-	Interpolation.prototype.velocity	= 0;
-	Interpolation.prototype.running		= false;
+	Interpolation.prototype.speed = 0.5;
+	Interpolation.prototype.spring = 0.5;
+	Interpolation.prototype.target = 1;
+	Interpolation.prototype.value = 0;
+	Interpolation.prototype.velocity = 0;
+	Interpolation.prototype.running = false;
 	
 	Interpolation.prototype.start = function() {
 		this.running = true;

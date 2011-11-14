@@ -1,5 +1,6 @@
 (function(window) {
 	
+	/** Singleton Event Dispatcher. */
 	var _dispatcher = new EventDispatcher();
 	
 	// Singleton constructor

@@ -4,8 +4,8 @@
 	var MathUtil = MathUtil || {};
 	
 	// Constants
-	MathUtil.DEGREES		= 180/Math.PI;
-	MathUtil.RADIANS		= Math.PI/180;
+	MathUtil.DEGREES = 180/Math.PI;
+	MathUtil.RADIANS = Math.PI/180;
 	
 	/**
 	 * A number in between 2 numbers at a specific percent.
@@ -130,12 +130,12 @@
 	 * @returns Object
 	 */
 	MathUtil.rotateX = function( point, rotation ){
-		var ang		= MathUtil.degreesToRadians( rotation );
-		var rotated	= { x: point.x, y: point.y, z: point.z };
-		var cosRY	= Math.cos(ang);
-		var sinRY	= Math.sin(ang);
-		point.y		= MathUtil.roundTo( (rotated.y*cosRY)-(rotated.z*sinRY), 100 );
-		point.z		= MathUtil.roundTo( (rotated.y*sinRY)+(rotated.z*cosRY), 100 );
+		var ang = MathUtil.degreesToRadians( rotation );
+		var rotated = { x: point.x, y: point.y, z: point.z };
+		var cosRY = Math.cos(ang);
+		var sinRY = Math.sin(ang);
+		point.y = MathUtil.roundTo( (rotated.y*cosRY)-(rotated.z*sinRY), 100 );
+		point.z = MathUtil.roundTo( (rotated.y*sinRY)+(rotated.z*cosRY), 100 );
 		delete rotated;
 		return point;
 	}
@@ -147,12 +147,12 @@
 	 * @returns Object
 	 */
 	MathUtil.rotateY = function( point, rotation ) {
-		var ang		= MathUtil.degreesToRadians( rotation );
-		var rotated	= { x: point.x, y: point.y, z: point.z };
-		var cosRY	= Math.cos(ang);
-		var sinRY	= Math.sin(ang);
-		point.x		= MathUtil.roundTo( (rotated.x*cosRY)-(rotated.z*sinRY), 100 );
-		point.z		= MathUtil.roundTo( (rotated.x*sinRY)+(rotated.z*cosRY), 100 );
+		var ang = MathUtil.degreesToRadians( rotation );
+		var rotated = { x: point.x, y: point.y, z: point.z };
+		var cosRY = Math.cos(ang);
+		var sinRY = Math.sin(ang);
+		point.x = MathUtil.roundTo( (rotated.x*cosRY)-(rotated.z*sinRY), 100 );
+		point.z = MathUtil.roundTo( (rotated.x*sinRY)+(rotated.z*cosRY), 100 );
 		delete rotated;
 		return point;
 	}
@@ -164,12 +164,12 @@
 	 * @returns Object
 	 */
 	MathUtil.rotateZ = function( point, rotation ){
-		var ang		= MathUtil.degreesToRadians( rotation );
-		var rotated	= { x: point.x, y: point.y, z: point.z };
-		var cosRY	= Math.cos(ang);
-		var sinRY	= Math.sin(ang);
-		point.x		= MathUtil.roundTo( (rotated.x*cosRY)-(rotated.y*sinRY), 100 );
-		point.z		= MathUtil.roundTo( (rotated.x*sinRY)+(rotated.y*cosRY), 100 );
+		var ang = MathUtil.degreesToRadians( rotation );
+		var rotated = { x: point.x, y: point.y, z: point.z };
+		var cosRY = Math.cos(ang);
+		var sinRY = Math.sin(ang);
+		point.x = MathUtil.roundTo( (rotated.x*cosRY)-(rotated.y*sinRY), 100 );
+		point.z = MathUtil.roundTo( (rotated.x*sinRY)+(rotated.y*cosRY), 100 );
 		delete rotated;
 		return point;
 	}
