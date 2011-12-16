@@ -12,13 +12,11 @@
 	
 	// Constructor
 	var Paginator = function() {
+		this.items = [];
+		this.rows = 3;
+		this.columns = 2;
+		this.currentPage = 0;
 	}
-	
-	// Public
-	Paginator.prototype.items = [];
-	Paginator.prototype.rows = 3;
-	Paginator.prototype.columns = 2;
-	Paginator.prototype.currentPage = 0;
 	
 	var newItems = [];
 	

@@ -1,7 +1,7 @@
 (function(window) {
 	
 	// Private
-	var dateInstance = new DateObject( new Date() );
+	var dateInstance = new DateObject( Time.initTime );
 	
 	// Singleton constructor
 	var DateUtil = function() {}
@@ -226,3 +226,4 @@
 	
 	window.DateUtil = DateUtil;
 }(window));
+DateUtil();

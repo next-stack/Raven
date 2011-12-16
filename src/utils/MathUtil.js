@@ -1,6 +1,5 @@
 (function(window) {
 	
-	// Singleton
 	var MathUtil = MathUtil || {};
 	
 	// Constants
@@ -69,7 +68,17 @@
 	 */
 	MathUtil.radiansToDegrees = function( radians ) {
 		return MathUtil.resolveAngle( radians * MathUtil.DEGREES );
-	}
+  }
+  
+  /**
+   * The angle from two points.
+   * @param p1 - Object - An object with "x" and "y" variables.
+   * @param p2 - Object - An object with "x" and "y" variables.
+   * @returns Number
+  */
+  MathUtil.getAngleRad = function (p1, p2) {
+    return Math.atan2(p2.y - p1.y, p2.x - p1.x);
+  }
 
 	/**
 	 * The angle from two points.
@@ -77,10 +86,9 @@
 	 * @param p2 - Object - An object with "x" and "y" variables.
 	 * @returns Number
 	 */
-	MathUtil.getAngle = function( p1, p2 ) {
-		var r = Math.atan2( p2.y - p1.y, p2.x - p1.x );
-		return MathUtil.radiansToDegrees( r );
-	}
+	MathUtil.getAngleDeg = function( p1, p2 ) {
+		return MathUtil.radiansToDegrees(MathUtil.getAngleRad( p1, p2 ));
+  }
 
 	/**
 	 * The radians from two points.
@@ -172,6 +180,18 @@
 		point.z = MathUtil.roundTo( (rotated.x*sinRY)+(rotated.y*cosRY), 100 );
 		delete rotated;
 		return point;
+	}
+	
+	/**
+	 * Creates a new 2D point based on the specified point's position relative to the stage's size.
+	 * @param point3D - Object - An object with "x", "y", and "z" variables.
+	 * @returns Object
+	 */
+	MathUtil.obj3Dto2D = function( point3D ) {
+		var point2D = {};
+		point2D.x = point3D.x + View.width  * 0.5;
+		point2D.y = point3D.y + View.height * 0.5;
+		return point2D;
 	}
 	
 	window.MathUtil = MathUtil;

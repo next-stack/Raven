@@ -1,7 +1,7 @@
 (function(window) {
 	
 	// Constructor
-	Ease = function() {
+	var Ease = function() {
 	}
 
 	Ease._2PI = 6.283185307179586;
