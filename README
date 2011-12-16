@@ -1,6 +1,9 @@
 Created by Colin Duffy
 http://www.tomorrowevening.com/
 
+Most up-to-date demo url:
+http://tomorrowevening.com/raven/
+
 Originally written in AS3, this framework is targeted for HTML5's canvas and WebGL implementation.
 
 As of now, index.htm houses instances of these classes for testing.

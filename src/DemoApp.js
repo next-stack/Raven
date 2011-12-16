@@ -6,7 +6,6 @@ ClassUtil.extend(DemoApp, App);
 
 DemoApp.prototype.setup = function () {
   this.super.setup.call(this);
-	console.log( "Pixel Ratio: " + window.devicePixelRatio.toString() );
 }
 
 DemoApp.prototype.draw = function () {
