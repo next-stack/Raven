@@ -28,10 +28,6 @@ Raven.getAngleDeg = function(p1, p2) {
   return Raven.radiansToDegrees(Raven.getAngleRad(p1, p2));
 }
 
-Raven.getAngleRad = function(p1, p2) {
-  return Raven.degreesToRadians(Raven.getAngle(p1, p2));
-}
-
 Raven.distance = function(n1, n2) {
   var dist = n1 - n2;
   return Math.sqrt(dist * dist);
@@ -152,7 +148,7 @@ Raven.DOM.getElemID = function(domID) {
 Raven.DOM.watch = function(target, event, handler) {
   target.addEventListener(event, function(evt){
     if(handler) handler(evt);
-  });
+  }, false);
 }
 
 Raven.DOM.unwatch = function(target, event, handler) {

@@ -72,6 +72,16 @@ Raven.Physics.LinearForce = function() {
   return this;
 }
 
+// Rotational Force
+Raven.Physics.RotationalForce = function() {
+  this.pos = new Raven.Vec3.zero();
+  this.size = 100;
+  this.strength = new Raven.Vec3(0.1, 0.1, 0.1);
+  this.type = Raven.Physics.F_ROTATIONAL;
+  this.rotationStrength = -45;
+  return this;
+}
+
 Raven.Physics.Force.prototype.applyForce = function(particle, dist, length, effect) {
   dist = dist.divideN(length);
   particle.acc = particle.acc.add(dist.multiply(effect));
@@ -86,8 +96,16 @@ Raven.Physics.LinearForce.prototype.applyForce = function(particle, dist, length
   return this;
 }
 
+Raven.Physics.RotationalForce.prototype.applyForce = function(particle, dist, length, effect) {
+  var phi = Raven.getAngleRad(dist, dist, new Raven.Vec2.zero()) + Raven.degreesToRadians(this.rotationStrength);
+  particle.vel.x += Math.cos(phi) * effect.x;
+  particle.vel.y += Math.sin(phi) * effect.y;
+  return this;
+}
+
 Raven.Physics.Force.prototype.update =
-Raven.Physics.LinearForce.prototype.update = function(particleList) {
+Raven.Physics.LinearForce.prototype.update =
+Raven.Physics.RotationalForce.prototype.update = function(particleList) {
   var total = particleList.length;
   if(total < 1) return;
   
