@@ -18,6 +18,7 @@ app.render = function() {
   Raven.Canvas.drawFont("Raven: Basic App example", 25, 40);
   Raven.Canvas.drawFont("Acceleration: " + Raven.View.acceleration.x + ", " + Raven.View.acceleration.y + ", " + Raven.View.acceleration.z, 25, 60);
   Raven.Canvas.drawFont("Gyro: " + Raven.View.rotation.x + ", " + Raven.View.rotation.y + ", " + Raven.View.rotation.z, 25, 80);
+  Raven.Canvas.drawFont("Stage Size: " + Raven.View.width + ", " + Raven.View.height, 25, 120);
   
   if(this.isDown) Raven.Canvas.drawCircle(this.mouseX, this.mouseY, 50, true);
   
