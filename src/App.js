@@ -34,9 +34,37 @@ Raven.App.prototype.mouseDown = function(mx, my) {}
 Raven.App.prototype.mouseMove = function(mx, my) {}
 Raven.App.prototype.mouseUp = function(mx, my) {}
 // Mobile
-Raven.App.prototype.touchDown = function(mx, my) {}
-Raven.App.prototype.touchMove = function(mx, my) {}
-Raven.App.prototype.touchUp = function(mx, my) {}
+Raven.App.prototype.touchDown = function(id, mx, my) {}
+Raven.App.prototype.touchMove = function(id, mx, my) {}
+Raven.App.prototype.touchUp = function(id, mx, my) {}
+Raven.App.prototype.touchHandler = function(evt) {
+  this.touchPoints = [];
+  
+  var touches = evt.targetTouches;
+  var total = touches.length;
+  for(var i = 0; i < total; ++i) {
+    this.touchPoints[i] = { id: touches[i].identifier, x: touches[i].clientX, y: touches[i].clientY };
+  }
+  touches = null;
+  
+  var changes = evt.changedTouches;
+  total = changes.length;
+  
+  switch(evt.type) {
+    case Raven.DOM.TOUCH_DOWN:
+      for(i = 0; i < total; ++i) this.touchDown(changes[i].identifier, changes[i].clientX, changes[i].clientY);
+    break;
+    
+    case Raven.DOM.TOUCH_MOVE:
+      for(i = 0; i < total; ++i) this.touchMove(changes[i].identifier, changes[i].clientX, changes[i].clientY);
+    break;
+    
+    case Raven.DOM.TOUCH_UP:
+      for(i = 0; i < total; ++i) this.touchUp(changes[i].identifier, changes[i].clientX, changes[i].clientY);
+    break;
+  }
+  touches = null;
+}
 Raven.App.prototype.acceleration = function(vecAmt) {}
 Raven.App.prototype.gyro = function(vecAmt) {}
 
@@ -53,34 +81,16 @@ Raven.App.renderHandler = function() {
 
 Raven.App.prototype.mobileHandler = function(evt) {
   evt.preventDefault();
-  Raven.AppHandler.touchPoints = [];
-  if(evt.targetTouches) {
-    var total = evt.targetTouches.length;
-    for(var i = 0; i < total; ++i) {
-      Raven.AppHandler.touchPoints[i] = { id: evt.targetTouches[i].identifier, x: evt.targetTouches[i].clientX, y: evt.targetTouches[i].clientY };
-    }
+  
+  if(evt.type == Raven.DOM.TOUCH_DOWN || evt.type == Raven.DOM.TOUCH_MOVE || evt.type == Raven.DOM.TOUCH_UP) {
+    total = evt.changedTouches.length;
   }
   
   switch(evt.type) {
     case Raven.DOM.TOUCH_DOWN:
-      if(evt.clientX < Raven.View.width && evt.clientY < Raven.View.height) {
-        Raven.AppHandler.touchHandler(evt);
-        Raven.AppHandler.touchDown(evt.clientX, evt.clientY);
-      }
-    break;
-    
     case Raven.DOM.TOUCH_MOVE:
-      if(evt.clientX < Raven.View.width && evt.clientY < Raven.View.height) {
-        Raven.AppHandler.touchHandler(evt);
-        Raven.AppHandler.touchMove(evt.clientX, evt.clientY);
-      }
-    break;
-    
     case Raven.DOM.TOUCH_UP:
-      if(evt.clientX < Raven.View.width && evt.clientY < Raven.View.height) {
-        Raven.AppHandler.touchHandler(evt);
-        Raven.AppHandler.touchUp(evt.clientX, evt.clientY);
-      }
+      Raven.AppHandler.touchHandler(evt);
     break;
     
     case Raven.DOM.GYRO_UPDATE:
