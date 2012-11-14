@@ -5,6 +5,7 @@ Raven.View.canvas = 0;
 Raven.View.context = 0;
 Raven.View.width = 0;
 Raven.View.height = 0;
+Raven.View.enableRetina = false;
 Raven.View.pixelRatio = 1;
 Raven.View.acceleration = new Raven.Vec3.zero();
 Raven.View.rotation = new Raven.Vec3.zero();
@@ -17,10 +18,11 @@ Raven.Canvas.lineWidth = 1;
 Raven.Canvas.font;
 
 Raven.Canvas.size = function(width, height) {
-  Raven.View.width = width * Raven.View.pixelRatio;
-  Raven.View.height = height * Raven.View.pixelRatio;
-  Raven.View.canvas.width = width * Raven.View.pixelRatio;
-  Raven.View.canvas.height = height * Raven.View.pixelRatio;
+  var scale = Raven.View.enableRetina ? Raven.View.pixelRatio : 1;
+  Raven.View.width = width * scale;
+  Raven.View.height = height * scale;
+  Raven.View.canvas.width = width * scale;
+  Raven.View.canvas.height = height * scale;
 }
 
 Raven.Canvas.init = function(canvas) {
@@ -29,7 +31,7 @@ Raven.Canvas.init = function(canvas) {
     Raven.View.context = canvas.getContext('2d');
     var ratio = window.devicePixelRatio;
     Raven.View.pixelRatio = ratio;
-    Raven.View.context.scale(ratio, ratio);
+    if(Raven.View.enableRetina) Raven.View.context.scale(ratio, ratio);
     Raven.Canvas.size(Raven.View.canvas.width, Raven.View.canvas.height);
   } else {
     console.log("Error establishing canvas (Raven.Canvas.init)");
