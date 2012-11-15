@@ -69,6 +69,7 @@ Raven.App.prototype.acceleration = function(vecAmt) {}
 Raven.App.prototype.gyro = function(vecAmt) {}
 
 Raven.App.updateHandler = function() {
+  Raven.Date.update();
   Raven.AppHandler.update();
   Raven.App.renderHandler();
   ++Raven.frameNum;
@@ -150,17 +151,17 @@ Raven.App.prototype.init = function() {
   Raven.DOM.watch(document, Raven.DOM.MOUSE_DOWN, this.evtHandler);
   Raven.DOM.watch(document, Raven.DOM.MOUSE_MOVE, this.evtHandler);
   Raven.DOM.watch(document, Raven.DOM.MOUSE_UP, this.evtHandler);
-  if(Raven.AppHandler.supportMobile) {
+  
+  Raven.AppHandler.isMobile = Raven.checkMobile();
+  if(Raven.AppHandler.supportMobile && Raven.AppHandler.isMobile) {
     Raven.DOM.watch(Raven.View.canvas, Raven.DOM.TOUCH_DOWN, this.mobileHandler);
     Raven.DOM.watch(Raven.View.canvas, Raven.DOM.TOUCH_MOVE, this.mobileHandler);
     Raven.DOM.watch(Raven.View.canvas, Raven.DOM.TOUCH_UP, this.mobileHandler);
     
     if(window.DeviceOrientationEvent) {
-      this.isMobile = true;
       Raven.DOM.watch(window, Raven.DOM.GYRO_UPDATE, this.mobileHandler);
     }
     if(window.DeviceMotionEvent) {
-      this.isMobile = true;
       Raven.DOM.watch(window, Raven.DOM.ACCELERATION_UPDATE, this.mobileHandler);
     }
   }

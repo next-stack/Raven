@@ -11,6 +11,10 @@ Raven.Vec2.prototype.copy = function() {
   return new Raven.Vec2(this.x, this.y);
 }
 
+Raven.Vec2.prototype.round = function() {
+  return new Raven.Vec2(Math.round(this.x), Math.round(this.y));
+}
+
 Raven.Vec2.prototype.add = function(vec) {
   var v = this.copy();
   v.x += vec.x;
@@ -112,6 +116,10 @@ Raven.Vec3 = function(px, py, pz) {
 
 Raven.Vec3.prototype.copy = function() {
   return new Raven.Vec3(this.x, this.y, this.z);
+}
+
+Raven.Vec3.prototype.round = function() {
+  return new Raven.Vec3(Math.round(this.x), Math.round(this.y), Math.round(this.z));
 }
 
 Raven.Vec3.prototype.add = function(vec) {

@@ -129,3 +129,18 @@ Raven.Canvas.drawRect = function(x, y, wid, hei, fill, stroke) {
   if(stroke) Raven.View.context.stroke();
   if(fill) Raven.View.context.fill();
 }
+
+Raven.Canvas.begin = function() {
+  Raven.View.context.beginPath();
+}
+
+Raven.Canvas.end = function(close, stroke, fill) {
+  if(close)  Raven.View.context.closePath();
+  if(stroke) Raven.View.context.stroke();
+  if(fill)   Raven.View.context.fill();
+}
+
+Raven.Canvas.bezierCurve = function(startX, startY, controlX1, controlY1, controlX2, controlY2, endX, endY) {
+  Raven.View.context.moveTo(startX, startY);
+  Raven.View.context.bezierCurveTo(controlX1, controlY1, controlX2, controlY2, endX, endY);
+}

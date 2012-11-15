@@ -13,6 +13,10 @@ Raven.includeJS = function(src) {
   document.write('<script type="text/javascript" src="../../src/' + src + '"></script>');
 }
 
+Raven.checkMobile = function() {
+  return navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/) != null;
+}
+
 Raven.includeJS("Utils.js");
 Raven.includeJS("Geom.js");
 Raven.includeJS("Canvas.js");
