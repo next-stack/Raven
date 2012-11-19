@@ -9,13 +9,19 @@ function DragManager() {
   this.points = {};
   
   this.beginDrag = function(index, startX, startY) {
+    var scale = new Raven.Interpolation();
+    scale.spring = 0.2;
+    scale.speed  = 0.7;
+    scale.target = 0;
+    scale.value  = 0;
     var drag = {
       angle: 0,
       distance: new Raven.Vec2.zero(),
       startX: startX,
       startY: startY,
       x: startX,
-      y: startY
+      y: startY,
+      scale: scale
     };
     this.points['pt' + index] = drag;
   }
@@ -40,18 +46,14 @@ var app = Raven.makeInstance(Raven.App);
 app.fullsize = true;
 app.supportMobile = true;
 
-var mousePressed = false;
-
 var drags = new DragManager();
 
 app.mouseDown = function(mx, my) {
   drags.beginDrag(0, mx, my);
-  mousePressed = true;
 }
-app.mouseMove = function(mx, my) { if(mousePressed) drags.updateDrag(0, mx, my); }
+app.mouseMove = function(mx, my) { if(this.isMousePressed) drags.updateDrag(0, mx, my); }
 app.mouseUp = function(mx, my) {
   drags.endDrag(0);
-  mousePressed = false;
 }
 
 app.touchDown = function(id, mx, my) {
@@ -64,31 +66,74 @@ app.touchUp = function(id, mx, my) {
   drags.endDrag(id);
 }
 
-app.render = function() {
+function renderDrag(drag) {
+  /*
+  Raven.Canvas.setStrokeColorRGBA(255, 255, 255, 16);
+  Raven.Canvas.drawLine(drag.startX, drag.y, drag.x, drag.y);
+  Raven.Canvas.drawLine(drag.x, drag.startY, drag.x, drag.y);
+  
+  Raven.Canvas.setStrokeColorRGBA(255, 255, 255, 102);
+  Raven.Canvas.drawLine(drag.startX, drag.startY, drag.x, drag.startY);
+  Raven.Canvas.drawLine(drag.startX, drag.startY, drag.startX, drag.y);
+  
+  Raven.Canvas.drawLine(drag.startX, drag.startY, drag.x, drag.y);
+  Raven.Canvas.drawCircle(drag.x, drag.startY, 15, true);
+  Raven.Canvas.drawCircle(drag.startX, drag.y, 15, true);
+  Raven.Canvas.drawCircle(drag.x, drag.y, 10, true);
+  
+  Raven.Canvas.drawFont("Angle: " + Math.round(drag.angle) + "°", drag.x + 20, drag.y - 46);
+  Raven.Canvas.drawFont("Distance X: " + Math.round(drag.distance.x), drag.x + 20, drag.y - 34);
+  Raven.Canvas.drawFont("Distance Y: " + Math.round(drag.distance.y), drag.x + 20, drag.y - 22);
+  Raven.Canvas.drawLine(drag.x + 20, drag.y - 16, drag.x + 125, drag.y - 16);
+  Raven.Canvas.drawFont("Distance: " + Math.round(drag.distance.x + drag.distance.y), drag.x + 20, drag.y - 4);
+  */
+  
+  if(drag.startX > 50 || drag.x < 50) return;
+  
+  /////
+  var size = 100;
+  var height = 100;
+  var halfHeight = height * 0.5;
+  
+  var xOffset = 50;
+  var yOffset = drag.startY - height;
+  
+  
+  var range = (drag.x - xOffset) / size;
+  range = Math.max(0, Math.min(1, range)); // limit
+  var scale = size * range;
+  
+  Raven.Canvas.setFillColorRGB(255, 0, 0);
+  Raven.Canvas.begin();
+  
+  Raven.View.context.moveTo(xOffset, yOffset);
+  Raven.View.context.bezierCurveTo( xOffset, yOffset + halfHeight,
+                                    xOffset + scale, yOffset + halfHeight,
+                                    xOffset + scale, yOffset + height);
+  
+  Raven.View.context.bezierCurveTo( xOffset + scale, yOffset + height + halfHeight,
+                                    xOffset, yOffset + height + halfHeight,
+                                    xOffset, yOffset + height + height);
+  
+  Raven.Canvas.end(true, false, true);
+  
   Raven.Canvas.setFillColorRGB(255, 255, 255);
+  Raven.Canvas.drawFont("Angle: " + Math.round(drag.angle) + "°", drag.x + 20, drag.y);
+  Raven.Canvas.drawFont("Distance: " + Math.round(drag.distance.x + drag.distance.y), drag.x + 20, drag.y + 12);
+  Raven.Canvas.drawFont("Scale: " + range, drag.x + 20, drag.y + 24);
+}
+
+app.render = function() {
+  Raven.Canvas.setFillColorRGB(255, 0, 0);
+  Raven.Canvas.drawRect(0, 0, 50, Raven.View.height);
   
   var total = 0;
   for(var drag in drags.points) {
-    Raven.Canvas.setStrokeColorRGBA(255, 255, 255, 16);
-    Raven.Canvas.drawLine(drags.points[drag].startX, drags.points[drag].y, drags.points[drag].x, drags.points[drag].y);
-    Raven.Canvas.drawLine(drags.points[drag].x, drags.points[drag].startY, drags.points[drag].x, drags.points[drag].y);
-    
-    Raven.Canvas.setStrokeColorRGBA(255, 255, 255, 102);
-    Raven.Canvas.drawLine(drags.points[drag].startX, drags.points[drag].startY, drags.points[drag].x, drags.points[drag].startY);
-    Raven.Canvas.drawLine(drags.points[drag].startX, drags.points[drag].startY, drags.points[drag].startX, drags.points[drag].y);
-    
-    Raven.Canvas.drawLine(drags.points[drag].startX, drags.points[drag].startY, drags.points[drag].x, drags.points[drag].y);
-    Raven.Canvas.drawCircle(drags.points[drag].x, drags.points[drag].startY, 15, true);
-    Raven.Canvas.drawCircle(drags.points[drag].startX, drags.points[drag].y, 15, true);
-    Raven.Canvas.drawCircle(drags.points[drag].x, drags.points[drag].y, 10, true);
-    
-    Raven.Canvas.drawFont("Angle: " + Math.round(drags.points[drag].angle) + "°", drags.points[drag].x + 20, drags.points[drag].y - 46);
-    Raven.Canvas.drawFont("Distance X: " + Math.round(drags.points[drag].distance.x), drags.points[drag].x + 20, drags.points[drag].y - 34);
-    Raven.Canvas.drawFont("Distance Y: " + Math.round(drags.points[drag].distance.y), drags.points[drag].x + 20, drags.points[drag].y - 22);
-    Raven.Canvas.drawLine(drags.points[drag].x + 20, drags.points[drag].y - 16, drags.points[drag].x + 125, drags.points[drag].y - 16);
-    Raven.Canvas.drawFont("Distance: " + Math.round(drags.points[drag].distance.x + drags.points[drag].distance.y), drags.points[drag].x + 20, drags.points[drag].y - 4);
+    renderDrag(drags.points[drag]);
     ++total;
   }
+  
+  Raven.Canvas.setFillColorRGB(255, 255, 255);
   Raven.Canvas.drawFont("Total: " + total, 20, 30);
 }
 
