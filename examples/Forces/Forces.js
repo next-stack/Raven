@@ -1,110 +1,184 @@
-Raven.Canvas.setBackgroundColorRGB(32, 32, 32);
+Raven.Canvas.setBackgroundColorRGB(17, 16, 18);
+
+var gui;
+var guiParams = {
+  fadeSpeed: 0.15,
+  lineWidth: 2,
+  connectionOpacity: 0.05,
+  showForces: true,
+  
+  attrackScene: false,
+  rotateScene: true,
+  sceneAttraction: 0.01,
+  sceneRotation: 90,
+  sceneStrength: 0.25,
+  
+  attractParticles: false,
+  rotateParticles: false,
+  particleAttraction: 0.005,
+  particleDistance: 100,
+  particleRepulsion: 1,
+  particleRotation: 5,
+  
+  dampening: 0.075
+};
 
 var app = Raven.makeInstance(Raven.App);
-app.fullsize = false;
+app.fullsize = true;
+app.autoClear = false;
 app.supportMobile = false;
 
-app.isDown = false;
+// Physics
+var engine = Raven.makeInstance(Raven.Physics.ParticleController);
+var centerGravityForce = new Raven.Physics.Force();
+var centerRotationalForce = new Raven.Physics.RotationalForce();
 
-var engine = new Raven.Physics.ParticleController();
-
-app.init = function() {
-  this.super.init();
-  
-  var cStrength = 0.01;
-  // Left force
-  var aForce = new Raven.Physics.Force();
-  aForce.pos.x = 150;
-  aForce.pos.y = Raven.View.height / 2;
-  aForce.strength = new Raven.Vec3(-cStrength, -cStrength, -cStrength);
-  engine.addForce(aForce);
-  
-  // Middle force
-  var lForce = new Raven.Physics.LinearForce();
-  lForce.pos.x = 400;
-  lForce.pos.y = Raven.View.height / 2;
-  lForce.direction = 180;
-  lForce.directionStrength = 2;
-  lForce.strength = new Raven.Vec3(cStrength, cStrength, cStrength);
-  engine.addForce(lForce);
-  
-  // Right force
-  var rForce = new Raven.Physics.RotationalForce();
-  rForce.pos.x = 650;
-  rForce.pos.y = Raven.View.height / 2;
-  rForce.strength = new Raven.Vec3(-0.2, -0.2, -0.2);
-  rForce.rotationStrength = 0;
-  engine.addForce(rForce);
-  
-  // Disperse initial particles
-  for(var i = 0; i < 100; ++i) {
-    this.addParticle(Math.random() * Raven.View.width, Math.random() * Raven.View.height);
-  }
-}
-
-app.update = function() {
-  engine.update();
-   // Creates the wipe animation for the linear force
-  engine.forces[1].direction = Raven.cosRange(Raven.frameNum, 240, -120);
-}
-
-app.addParticle = function(px, py) {
-  // Velocity
-  var minV = -1.0;
-  var maxV =  1.0;
-  
-  var p = new Raven.Physics.Particle(px, py, 0);
-  p.vel = Raven.Vec3.randomRange(minV, minV, 0, maxV, maxV, 0);
+app.addParticle = function(pos) {
+  var p = new Raven.Physics.Particle(pos.x, pos.y, pos.z);
+  p.vel = Raven.Vec3.randomRange(-1, -1, 0, 1, 1, 0);
+  p.col = Raven.Vec3.randomRange(102, 102, 102, 255, 255, 255).round();
   engine.addParticle(p);
 }
 
-app.mouseDown = function(mx, my) {
-  this.isDown = true;
-  this.addParticle(mx, my);
+app.addParticles = function(num) {
+  for(var i = 0; i < num; ++i) this.addParticle( Raven.Vec3.randomRange(0, 0, 0, Raven.View.width, Raven.View.height, 0).round() );
 }
 
-app.mouseUp = function(mx, my) {
-  this.isDown = false;
+app.removeParticles = function(num) {
+  for(var i = 0; i < num; ++i) engine.removeParticle(i);
+}
+
+app.mouseDown = function(mx, my) {
+  this.addParticle(new Raven.Vec3(mx, my, 0));
 }
 
 app.mouseMove = function(mx, my) {
-  if(this.isDown) this.addParticle(mx, my);
+  if(this.isMousePressed) this.addParticle(new Raven.Vec3(mx, my, 0));
+}
+
+app.init = function() {
+  this.super.init();
+  this.addParticles(20);
+  engine.addForce(centerGravityForce);
+  engine.addForce(centerRotationalForce);
+}
+
+app.update = function() {
+  var centerInfluence = guiParams.attrackScene ? guiParams.sceneAttraction : 0;
+  centerGravityForce.pos.set(Raven.View.width / 2, Raven.View.height / 2, 0);
+  centerGravityForce.size = Raven.View.width / 2;
+  centerGravityForce.strength = centerInfluence;
+  
+  var rotationInfluence = guiParams.rotateScene ? guiParams.sceneStrength : 0;
+  centerRotationalForce.pos.set(Raven.View.width / 2, Raven.View.height / 2, 0);
+  centerRotationalForce.rotationStrength = guiParams.sceneRotation;
+  centerRotationalForce.size = Raven.View.width / 2;
+  centerRotationalForce.strength = rotationInfluence;
+  
+  var total = engine.totalParticles();
+  var connectionAlpha = Math.round(guiParams.connectionOpacity * 255);
+  Raven.Canvas.setStrokeWidth(1);
+  Raven.Canvas.setStrokeColorRGBA(255, 255, 255, connectionAlpha);
+  
+  // Each particle can act as it's own Attraction/Rotational Force
+  var attS = guiParams.attractParticles ? guiParams.particleAttraction : 0;
+  var rotS = guiParams.rotateParticles  ? guiParams.particleRepulsion : 0;
+  var n = 0;
+  var p, f, dist, eff, len;
+  for(var i = 0; i < total; ++i) {
+    for(n = 0; n < total; ++n) {
+      if(i != n) {
+        p = engine.particles[n];
+        
+        // Attraction
+        dist = p.difference(engine.particles[i]);
+        len = dist.length();
+        if(len < guiParams.particleDistance) {
+          len = Math.sqrt(len);
+          eff = attS * (1.0 - (len / guiParams.particleDistance));
+          Raven.Physics.Force.applyForce(p, dist, len, eff);
+          Raven.Canvas.drawLine(p.pos.x, p.pos.y, engine.particles[i].pos.x, engine.particles[i].pos.y); // draw a line between the particle & force
+        }
+        
+        // Rotation
+        len = Raven.distance3D(p.pos.x, p.pos.y, 0, engine.particles[i].pos.x, engine.particles[i].pos.y, 0);
+        if(len < guiParams.particleDistance) {
+          len = Math.sqrt(len);
+          eff = rotS * (1.0 - (len / guiParams.particleDistance));
+          Raven.Physics.RotationalForce.applyForce(p, dist, len, eff, guiParams.particleRotation);
+        }
+      }
+    }
+  }
+  
+  engine.dampen.set(guiParams.dampening, guiParams.dampening, guiParams.dampening);
+  engine.update();
 }
 
 app.render = function() {
-  // Show forces
-  var totalF = engine.totalForces();
-  for(var n = 0; n < totalF; ++n) {
-    switch(engine.forces[n].type) {
-      case Raven.Physics.F_GRAVITY: Raven.Canvas.setStrokeColorRGBA(255, 0, 0, 102); break;
-      case Raven.Physics.F_LINEAR:  Raven.Canvas.setStrokeColorRGBA(0, 255, 0, 102); break;
-      case Raven.Physics.F_ROTATIONAL: Raven.Canvas.setStrokeColorRGBA(0, 0, 255, 102); break;
+  Raven.Canvas.setFillColorRGBA(17, 16, 18, Math.round(guiParams.fadeSpeed * 255));
+  Raven.Canvas.drawRect(0, 0, Raven.View.width, Raven.View.height, true, false);
+  
+  var connectionAlpha = Math.round(guiParams.connectionOpacity * 255);
+  Raven.Canvas.setStrokeWidth(1);
+  Raven.Canvas.setStrokeColorRGBA(255, 255, 255, connectionAlpha);
+  if(guiParams.showForces) {
+    Raven.Canvas.drawCircle(centerGravityForce.pos.x, centerGravityForce.pos.y, centerGravityForce.size * 2, false, true);
+    Raven.Canvas.drawCircle(centerRotationalForce.pos.x, centerRotationalForce.pos.y, centerRotationalForce.size * 2, false, true);
+  }
+  
+  Raven.Canvas.setFillColorRGB(255, 255, 255);
+  
+  total = engine.totalParticles();
+  var p;
+  
+  for(i = 0; i < total; ++i) {
+    p = engine.particles[i];
+    if(p.pos.distance(p.prev) < 300) { // limit render due to particle wrapping
+      
+      if(guiParams.showForces) {
+        Raven.Canvas.setStrokeWidth(1);
+        Raven.Canvas.setStrokeColorRGBA(255, 255, 255, connectionAlpha);
+        Raven.Canvas.drawCircle(engine.particles[i].pos.x, engine.particles[i].pos.y, guiParams.particleDistance * 2, false, true);
+      }
+      
+      Raven.Canvas.setStrokeWidth(guiParams.lineWidth);
+      Raven.Canvas.setStrokeColorRGB(p.col.x, p.col.y, p.col.z);
+      Raven.Canvas.drawLine(p.prev.x, p.prev.y, p.pos.x, p.pos.y);
     }
-    Raven.Canvas.drawCircle(engine.forces[n].pos.x, engine.forces[n].pos.y, engine.forces[n].size*2, false, true);
   }
   
-  // Show which direction the of the linear force instance
-  var lForce = engine.forces[1];
-  var d = lForce.direction;
-  Raven.Canvas.setStrokeColorRGBA(0, 255, 0, 32);
-  Raven.Canvas.drawLine(lForce.pos.x, lForce.pos.y, Math.cos(Raven.degreesToRadians(d-30)) * lForce.size + lForce.pos.x, lForce.pos.y + Math.sin(Raven.degreesToRadians(d-30)) * lForce.size);
-  Raven.Canvas.drawLine(lForce.pos.x, lForce.pos.y, Math.cos(Raven.degreesToRadians(d+30)) * lForce.size + lForce.pos.x, lForce.pos.y + Math.sin(Raven.degreesToRadians(d+30)) * lForce.size);
-  
-  // Show particles
+  Raven.Canvas.setFillColorRGB(0, 0, 0);
+  Raven.Canvas.drawRect(20, 20, 100, 30, true, false);
   Raven.Canvas.setFillColorRGB(255, 255, 255);
-  var totalP = engine.totalParticles();
-  for(var i = 0; i < totalP; ++i) {
-    Raven.Canvas.drawCircle(engine.particles[i].pos.x, engine.particles[i].pos.y, 3, true);
-  }
-  
-  var rForce = engine.forces[2];
-  Raven.Canvas.setFillColorRGB(255, 255, 255);
-  Raven.Canvas.drawFont("Total Particles: " + engine.totalParticles(), 10, 20);
-  Raven.Canvas.drawFont("Attraction force", 110, 425);
-  Raven.Canvas.drawFont("Linear force: " + Math.round(lForce.direction), 360, 425);
-  Raven.Canvas.drawFont("Rotational force: " + rForce.rotationStrength, 620, 425);
+  Raven.Canvas.drawFont("Total Particles: " + total, 25, 35);
 }
 
 app.setup(800, 600); // initial size
-app.init();
 app.autoRender();
+
+window.onload = function() {
+  app.init();
+  
+  gui = new dat.GUI();
+  
+  // Scene params
+  gui.add(guiParams, "fadeSpeed",         0, 1);
+  gui.add(guiParams, "lineWidth",         1,  5);
+  gui.add(guiParams, "connectionOpacity", 0,  1);
+  gui.add(guiParams, "showForces",        guiParams.showForces);
+  gui.add(guiParams, "dampening",         0, 0.2);
+  gui.add(guiParams, "attrackScene",      guiParams.attrackScene);
+  gui.add(guiParams, "rotateScene",       guiParams.rotateScene);
+  gui.add(guiParams, "sceneAttraction",   -0.25, 0.25);
+  gui.add(guiParams, "sceneRotation",     -180, 180);
+  gui.add(guiParams, "sceneStrength",     0, 0.25);
+  
+  // Particle params
+  gui.add(guiParams, "attractParticles",      guiParams.attractParticles);
+  gui.add(guiParams, "rotateParticles",       guiParams.rotateParticles);
+  gui.add(guiParams, "particleAttraction",    -0.25, 0.25);
+  gui.add(guiParams, "particleDistance",      0, 100);
+  gui.add(guiParams, "particleRepulsion",     0, 1);
+  gui.add(guiParams, "particleRotation",      0, 90);
+}

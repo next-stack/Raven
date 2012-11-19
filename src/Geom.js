@@ -7,6 +7,12 @@ Raven.Vec2 = function(px, py) {
   return this;
 }
 
+Raven.Vec2.prototype.set = function(px, py) {
+  this.x = px;
+  this.y = py;
+  return this;
+}
+
 Raven.Vec2.prototype.copy = function() {
   return new Raven.Vec2(this.x, this.y);
 }
@@ -87,7 +93,7 @@ Raven.Vec2.prototype.normalize = function() {
 }
 
 Raven.Vec2.prototype.distance = function(vec) {
-  return Raven.distance2D(this, vec);
+  return Raven.distance2D(this.x, this.y, vec.x, vec.y);
 }
 
 Raven.Vec2.zero = function() {
@@ -108,6 +114,13 @@ Raven.Vec2.randomRange = function(minX, minY, maxX, maxY) {
 
 // Vec3
 Raven.Vec3 = function(px, py, pz) {
+  this.x = px;
+  this.y = py;
+  this.z = pz;
+  return this;
+}
+
+Raven.Vec3.prototype.set = function(px, py, pz) {
   this.x = px;
   this.y = py;
   this.z = pz;
@@ -186,7 +199,7 @@ Raven.Vec3.prototype.divideN = function(value) {
   return v;
 }
 
-Raven.Vec2.prototype.equals = function(vec) {
+Raven.Vec3.prototype.equals = function(vec) {
   return this.x == vec.x && this.y == vec.y && this.z == vec.z;
 }
 
@@ -203,7 +216,7 @@ Raven.Vec3.prototype.normalize = function() {
 }
 
 Raven.Vec3.prototype.distance = function(vec) {
-  return Raven.distance3D(this, vec);
+  return Raven.distance3D(this.x, this.y, this.z, vec.x, vec.y, vec.z);
 }
 
 Raven.Vec3.zero = function() {

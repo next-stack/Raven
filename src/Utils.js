@@ -33,12 +33,12 @@ Raven.distance = function(n1, n2) {
   return Math.sqrt(dist * dist);
 }
 
-Raven.distance2D = function(p1, p2) {
-  return Raven.distance(p1.x, p2.x) + Raven.distance(p1.y, p2.y);
+Raven.distance2D = function(x1, y1, x2, y2) {
+  return Raven.distance(x1, x2) + Raven.distance(y1, y2);
 }
 
-Raven.distance3D = function(p1, p2) {
-  return Raven.distance2D(p1, p2) + Raven.distance(p1.z, p2.z);
+Raven.distance3D = function(x1, y1, z1, x2, y2, z2) {
+  return Raven.distance2D(x1, y1, x2, y2) + Raven.distance(z1, z2);
 }
 
 Raven.difference = function(n1, n2) {

@@ -7,6 +7,7 @@ Raven.App = function() {
   this.supportMobile = false;
   this.mouseX = -1;
   this.mouseY = -1;
+  this.isMousePressed = false;
   this.touchPoints = [];
   this.isMobile = false;
   
@@ -69,7 +70,6 @@ Raven.App.prototype.acceleration = function(vecAmt) {}
 Raven.App.prototype.gyro = function(vecAmt) {}
 
 Raven.App.updateHandler = function() {
-  Raven.Date.update();
   Raven.AppHandler.update();
   Raven.App.renderHandler();
   ++Raven.frameNum;
@@ -123,6 +123,7 @@ Raven.App.prototype.evtHandler = function(evt) {
       if(evt.clientX < Raven.View.width && evt.clientY < Raven.View.height) {
         Raven.AppHandler.mouseX = evt.clientX;
         Raven.AppHandler.mouseY = evt.clientY;
+        Raven.AppHandler.isMousePressed = true;
         Raven.AppHandler.mouseDown(evt.clientX, evt.clientY);
       }
     break;
@@ -141,6 +142,7 @@ Raven.App.prototype.evtHandler = function(evt) {
         // Reset pos
         Raven.AppHandler.mouseX = -1;
         Raven.AppHandler.mouseY = -1;
+        Raven.AppHandler.isMousePressed = false;
       }
     break;
   }
@@ -148,20 +150,20 @@ Raven.App.prototype.evtHandler = function(evt) {
 
 Raven.App.prototype.init = function() {
   Raven.DOM.watch(window, Raven.DOM.RESIZE, this.evtHandler);
-  Raven.DOM.watch(document, Raven.DOM.MOUSE_DOWN, this.evtHandler);
-  Raven.DOM.watch(document, Raven.DOM.MOUSE_MOVE, this.evtHandler);
-  Raven.DOM.watch(document, Raven.DOM.MOUSE_UP, this.evtHandler);
-  
-  Raven.AppHandler.isMobile = Raven.checkMobile();
-  if(Raven.AppHandler.supportMobile && Raven.AppHandler.isMobile) {
+  Raven.DOM.watch(Raven.View.canvas, Raven.DOM.MOUSE_DOWN, this.evtHandler);
+  Raven.DOM.watch(Raven.View.canvas, Raven.DOM.MOUSE_MOVE, this.evtHandler);
+  Raven.DOM.watch(Raven.View.canvas, Raven.DOM.MOUSE_UP, this.evtHandler);
+  if(Raven.AppHandler.supportMobile) {
     Raven.DOM.watch(Raven.View.canvas, Raven.DOM.TOUCH_DOWN, this.mobileHandler);
     Raven.DOM.watch(Raven.View.canvas, Raven.DOM.TOUCH_MOVE, this.mobileHandler);
     Raven.DOM.watch(Raven.View.canvas, Raven.DOM.TOUCH_UP, this.mobileHandler);
     
     if(window.DeviceOrientationEvent) {
+      this.isMobile = true;
       Raven.DOM.watch(window, Raven.DOM.GYRO_UPDATE, this.mobileHandler);
     }
     if(window.DeviceMotionEvent) {
+      this.isMobile = true;
       Raven.DOM.watch(window, Raven.DOM.ACCELERATION_UPDATE, this.mobileHandler);
     }
   }
@@ -171,9 +173,9 @@ Raven.App.prototype.init = function() {
 
 Raven.App.prototype.dispose = function() {
   Raven.DOM.unwatch(window, Raven.DOM.RESIZE, this.evtHandler);
-  Raven.DOM.unwatch(document, Raven.DOM.MOUSE_DOWN, this.evtHandler);
-  Raven.DOM.unwatch(document, Raven.DOM.MOUSE_MOVE, this.evtHandler);
-  Raven.DOM.unwatch(document, Raven.DOM.MOUSE_UP, this.evtHandler);
+  Raven.DOM.unwatch(Raven.View.canvas, Raven.DOM.MOUSE_DOWN, this.evtHandler);
+  Raven.DOM.unwatch(Raven.View.canvas, Raven.DOM.MOUSE_MOVE, this.evtHandler);
+  Raven.DOM.unwatch(Raven.View.canvas, Raven.DOM.MOUSE_UP, this.evtHandler);
   Raven.DOM.unwatch(Raven.View.canvas, Raven.DOM.TOUCH_DOWN, this.mobileHandler);
   Raven.DOM.unwatch(Raven.View.canvas, Raven.DOM.TOUCH_MOVE, this.mobileHandler);
   Raven.DOM.unwatch(Raven.View.canvas, Raven.DOM.TOUCH_UP, this.mobileHandler);

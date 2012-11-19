@@ -56,7 +56,7 @@ Raven.Physics.F_ROTATIONAL = 2;
 Raven.Physics.Force = function() {
   this.pos = new Raven.Vec3.zero();
   this.size = 100;
-  this.strength = new Raven.Vec3(0.1, 0.1, 0.1);
+  this.strength =0.1;
   this.type = Raven.Physics.F_GRAVITY;
   return this;
 }
@@ -65,7 +65,7 @@ Raven.Physics.Force = function() {
 Raven.Physics.LinearForce = function() {
   this.pos = new Raven.Vec3.zero();
   this.size = 100;
-  this.strength = new Raven.Vec3(0.1, 0.1, 0.1);
+  this.strength = 0.1;
   this.type = Raven.Physics.F_LINEAR;
   this.direction = 0;
   this.directionStrength = 1;
@@ -76,50 +76,90 @@ Raven.Physics.LinearForce = function() {
 Raven.Physics.RotationalForce = function() {
   this.pos = new Raven.Vec3.zero();
   this.size = 100;
-  this.strength = new Raven.Vec3(0.1, 0.1, 0.1);
+  this.strength = 0.1;
   this.type = Raven.Physics.F_ROTATIONAL;
   this.rotationStrength = -45;
   return this;
 }
 
-Raven.Physics.Force.prototype.applyForce = function(particle, dist, length, effect) {
+//////////
+
+Raven.Physics.Force.applyForce = function(particle, dist, length, effect) {
   dist = dist.divideN(length);
-  particle.acc = particle.acc.add(dist.multiply(effect));
-  if(length < 1 && particle.movement() < 0.5) particle.alive = false; // kill particle if dormant
+  particle.acc = particle.acc.subtract(dist.multiplyN(effect));
+  return particle;
+}
+
+Raven.Physics.LinearForce.applyForce = function(particle, dist, length, effect, direction, directionStrength) {
+  var phi = Raven.degreesToRadians(direction);
+  particle.vel.x += Math.cos(phi) * effect * directionStrength;
+  particle.vel.y += Math.sin(phi) * effect * directionStrength;
+  return particle;
+}
+
+Raven.Physics.RotationalForce.applyForce = function(particle, dist, length, effect, rotationStrength) {
+  var phi = Raven.getAngleRad(dist, new Raven.Vec2.zero()) + Raven.degreesToRadians(rotationStrength);
+  particle.vel.x += Math.cos(phi) * effect;
+  particle.vel.y += Math.sin(phi) * effect;
+  return particle;
+}
+
+//////////
+
+Raven.Physics.Force.prototype.applyForce = function(particle, dist, length, effect) {
+  Raven.Physics.Force.applyForce(particle, dist, length, effect);
   return this;
 }
 
 Raven.Physics.LinearForce.prototype.applyForce = function(particle, dist, length, effect) {
-  var phi = Raven.degreesToRadians(this.direction);
-  particle.vel.x += Math.cos(phi) * effect.x * this.directionStrength;
-  particle.vel.y += Math.sin(phi) * effect.y * this.directionStrength;
+  Raven.Physics.LinearForce.applyForce(particle, dist, length, effect, this.direction, this.directionStrength);
   return this;
 }
 
 Raven.Physics.RotationalForce.prototype.applyForce = function(particle, dist, length, effect) {
-  var phi = Raven.getAngleRad(dist, dist, new Raven.Vec2.zero()) + Raven.degreesToRadians(this.rotationStrength);
-  particle.vel.x += Math.cos(phi) * effect.x;
-  particle.vel.y += Math.sin(phi) * effect.y;
+  Raven.Physics.RotationalForce.applyForce(particle, dist, length, effect, this.rotationStrength);
   return this;
 }
 
+//////////
+
+// Each array item requires a vec3 "pos" instance (Particle.pos / Force.pos as examples)
 Raven.Physics.Force.prototype.update =
-Raven.Physics.LinearForce.prototype.update =
-Raven.Physics.RotationalForce.prototype.update = function(particleList) {
-  var total = particleList.length;
+Raven.Physics.LinearForce.prototype.update = function(arrList) {
+  var total = arrList.length;
   if(total < 1) return;
   
   var eff; // vec3
   var len; // num
   var p; // Particle iterator
   for(var i = 0; i < total; ++i) {
-    p = particleList[i];
+    p = arrList[i];
     var dist = p.difference(this);
     len = dist.length();
     if(len < this.size) {
       len = Math.sqrt(len);
-      eff = this.strength.multiplyN((1.0 - (len / this.size)));
+      eff = this.strength * (1.0 - (len / this.size));
       this.applyForce(p, dist, len, eff);
+      if(len < 1 && p.movement() < 0.5) p.alive = false; // kill particle if dormant
+    }
+  }
+}
+
+Raven.Physics.RotationalForce.prototype.update = function(arrList) {
+  var total = arrList.length;
+  if(total < 1) return;
+  
+  var eff; // vec3
+  var len; // num
+  var p; // Particle iterator
+  for(var i = 0; i < total; ++i) {
+    p = arrList[i];
+    len = Raven.distance3D(p.pos.x, p.pos.y, p.pos.z, this.pos.x, this.pos.y, this.pos.z);
+    if(len < this.size) {
+      len = Math.sqrt(len);
+      eff = this.strength * (1.0 - (len / this.size));
+      this.applyForce(p, p.difference(this), len, eff);
+      if(len < 1 && p.movement() < 0.5) p.alive = false; // kill particle if dormant
     }
   }
 }
@@ -127,6 +167,7 @@ Raven.Physics.RotationalForce.prototype.update = function(particleList) {
 //
 
 Raven.Physics.ParticleController = function() {
+  this.dampen = Raven.Vec3.zero();
   this.forces = [];
   this.particles = [];
   this.time = Raven.Vec3.one();
@@ -168,12 +209,10 @@ Raven.Physics.ParticleController.prototype.update = function() {
   
   var minBounds = Raven.Vec2.zero();
   var maxBounds = new Raven.Vec2(Raven.View.width, Raven.View.height);
-  var d = 0.01;
-  var dampen = new Raven.Vec3(d,d,d);
   
   for(i = 0; i < this.totalParticles(); ++i) {
     this.particles[i].update(this.time);
-    this.particles[i].dampen(dampen);
+    this.particles[i].dampen(this.dampen);
     this.particles[i].wrap(minBounds, maxBounds);
     if(!this.particles[i].alive || Raven.roundTo(this.particles[i].movement(), 100) == 0) this.removeParticle(i);
   }
