@@ -1,6 +1,61 @@
 var Raven = Raven || {};
 
-Raven.frameNum = 0;
+Raven.FrameCountdown = function(totalFrames) {
+  this.currentFrame = 0;
+  this.totalFrames = totalFrames ? totalFrames : 0;
+  
+  this.restart = function() {
+    this.currentFrame = this.totalFrames;
+  }
+  
+  this.update = function() {
+    if(this.currentFrame > 0) --this.currentFrame;
+  }
+  
+  this.active = function() {
+    return this.currentFrame > 0;
+  }
+}
+
+Raven.Timeline = function() {
+  
+  this.loop = true;
+  this.currentFrame = 0;
+  this.totalFrames = 0;
+  this.frames = {};
+  this.onUpdate = null;
+  
+  this.addFrame = function(frameName, frameNum, frameAction) {
+    if(frameNum > this.totalFrames) this.totalFrames = frameNum;
+    this.frames[frameNum] = {
+      name: frameName,
+      action: frameAction
+    };
+  }
+  
+  this.goto = function(frameNum) {
+    this.currentFrame = frameNum % this.totalFrames;
+    return this.currentFrame;
+  }
+  
+  this.gotoFrame = function(frameName) {
+    for(var i = 0; i < this.totalFrames; ++i) {
+      if(this.frames[i].name == frameName) {
+        this.currentFrame = i;
+        return this.currentFrame;
+      }
+    }
+  }
+  
+  this.update = function(time) {
+    time = time == null ? 1 : time;
+    var newFrame = this.loop ? (this.currentFrame+1+time) % this.totalFrames+1 : Math.min(this.totalFrames, Math.max(0, this.currentFrame + 1));
+    if(newFrame != this.currentFrame) {
+      this.currentFrame = newFrame;
+      if(this.onUpdate) this.onUpdate();
+    }
+  }
+}
 
 Raven.Interpolation = function() {
   this.speed = 0.5;
@@ -35,6 +90,57 @@ Raven.Interpolation.prototype = {
     return this;
   }
 };
+
+Raven.Spritesheet = function(src, totalFrames, frameRate, loop) {
+  
+  var _this = this;
+  
+  this.frameRate = frameRate != null ? frameRate : 60;
+  this.currentFrame = 0;
+  this.totalFrames = totalFrames;
+  this.loop = loop == null ? true : loop;
+  this.columns = totalFrames < 6 ? totalFrames : 6;
+  this.loaded = false;
+  this.onLoad = null;
+  
+  this.viewWidth = 0;
+  this.viewHeight = 0;
+  this.scaleX = 1;
+  this.scaleY = 1;
+  
+  this.img = new Image();
+  this.img.onload = function() {
+    _this.loaded = true;
+    
+    var rows = Math.ceil(_this.totalFrames / _this.columns);
+    _this.viewWidth = Math.floor(this.width / _this.columns);
+    _this.viewHeight = Math.floor(this.height / rows);
+    if(this.onLoad != null) this.onLoad(this);
+  }
+  
+  this.img.src = src;
+  
+  this.update = function(appCurrentFrame, appFrameRate) {
+    if(appCurrentFrame % Math.floor(appFrameRate / this.frameRate) == 0) {
+      var next = this.currentFrame + 1;
+      if(this.loop) {
+        this.currentFrame = next;
+      } else {
+        if(next < this.totalFrames) ++this.currentFrame;
+      }
+    }
+  }
+  
+  this.render = function(renderer, pos) {
+    if(!this.loaded) return this;
+    
+    var cur = this.currentFrame % this.totalFrames;
+    var xOffset = (cur % this.columns) * this.viewWidth;
+    var yOffset = Math.floor(cur / this.columns) * this.viewHeight;
+    renderer.context.drawImage(this.img, xOffset, yOffset, this.viewWidth, this.viewHeight, pos.x, pos.y, this.viewWidth, this.viewHeight);
+  }
+  
+}
 
 // Easing
 

@@ -1,2 +1,4 @@
 ## Raven ##
-Raven is currently undergoing a major remodel, recreating the environment I need for more common and experimental types of work. As Raven grows, it will support methods for animation, Canvas manipulation, mobile support, and WebGL functionality.
+Raven is a creative coding framework that combines ideologies seen in openFrameworks, Processing, and Flash, in a Javascript environment.
+Classes are separated by their type, making it easy to pick which parts of the framework are needed for your project. While still in it's adolescence,
+major changes are being made to accommodate for App-driven expansion.

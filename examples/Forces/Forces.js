@@ -1,24 +1,22 @@
-Raven.Canvas.setBackgroundColorRGB(17, 16, 18);
-
 var gui;
 var guiParams = {
   fadeSpeed: 0.15,
-  lineWidth: 2,
+  particleRadius: 2,
   connectionOpacity: 0.05,
   showForces: true,
   
-  attrackScene: false,
-  rotateScene: true,
+  attrackScene: true,
+  rotateScene: false,
   sceneAttraction: 0.01,
   sceneRotation: 90,
-  sceneStrength: 0.25,
+  sceneStrength: 0.05,
   
-  attractParticles: false,
+  attractParticles: true,
   rotateParticles: false,
-  particleAttraction: 0.005,
+  particleAttraction: -0.005,
   particleDistance: 100,
-  particleRepulsion: 1,
-  particleRotation: 5,
+  particleRepulsion: 0.1,
+  particleRotation: 90,
   
   dampening: 0.075
 };
@@ -41,7 +39,7 @@ app.addParticle = function(pos) {
 }
 
 app.addParticles = function(num) {
-  for(var i = 0; i < num; ++i) this.addParticle( Raven.Vec3.randomRange(0, 0, 0, Raven.View.width, Raven.View.height, 0).round() );
+  for(var i = 0; i < num; ++i) this.addParticle( Raven.Vec3.randomRange(0, 0, 0, this.view.width, this.view.height, 0).round() );
 }
 
 app.removeParticles = function(num) {
@@ -64,49 +62,54 @@ app.init = function() {
 }
 
 app.update = function() {
+  var renderer = this.view.renderer;
+  engine.maxBounds.x = this.view.width;
+  engine.maxBounds.y = this.view.height;
+  
   var centerInfluence = guiParams.attrackScene ? guiParams.sceneAttraction : 0;
-  centerGravityForce.pos.set(Raven.View.width / 2, Raven.View.height / 2, 0);
-  centerGravityForce.size = Raven.View.width / 2;
+  centerGravityForce.pos.set(this.view.width / 2, this.view.height / 2, 0);
+  centerGravityForce.size = this.view.width / 2;
   centerGravityForce.strength = centerInfluence;
   
   var rotationInfluence = guiParams.rotateScene ? guiParams.sceneStrength : 0;
-  centerRotationalForce.pos.set(Raven.View.width / 2, Raven.View.height / 2, 0);
+  centerRotationalForce.pos.set(this.view.width / 2, this.view.height / 2, 0);
   centerRotationalForce.rotationStrength = guiParams.sceneRotation;
-  centerRotationalForce.size = Raven.View.width / 2;
+  centerRotationalForce.size = this.view.width / 2;
   centerRotationalForce.strength = rotationInfluence;
   
   var total = engine.totalParticles();
   var connectionAlpha = Math.round(guiParams.connectionOpacity * 255);
-  Raven.Canvas.setStrokeWidth(1);
-  Raven.Canvas.setStrokeColorRGBA(255, 255, 255, connectionAlpha);
+  renderer.setStrokeRGBA(255, 255, 255, connectionAlpha);
   
   // Each particle can act as it's own Attraction/Rotational Force
   var attS = guiParams.attractParticles ? guiParams.particleAttraction : 0;
   var rotS = guiParams.rotateParticles  ? guiParams.particleRepulsion : 0;
   var n = 0;
-  var p, f, dist, eff, len;
+  var particle, nextParticle;
+  var dist, eff, len;
   for(var i = 0; i < total; ++i) {
     for(n = 0; n < total; ++n) {
       if(i != n) {
-        p = engine.particles[n];
+        particle = engine.particles[i];
+        nextParticle = engine.particles[n];
         
         // Attraction
-        dist = p.difference(engine.particles[i]);
+        dist = particle.difference(nextParticle);
         len = dist.length();
         if(len < guiParams.particleDistance) {
           len = Math.sqrt(len);
           eff = attS * (1.0 - (len / guiParams.particleDistance));
-          Raven.Physics.Force.applyForce(p, dist, len, eff);
-          Raven.Canvas.drawLine(p.pos.x, p.pos.y, engine.particles[i].pos.x, engine.particles[i].pos.y); // draw a line between the particle & force
+          Raven.Physics.Force.applyForce(particle, dist, len, eff);
+          renderer.drawLine(particle.pos.x, particle.pos.y, nextParticle.pos.x, nextParticle.pos.y); // draw a line between the particle & force
         }
         
         // Rotation
-        len = Raven.distance3D(p.pos.x, p.pos.y, 0, engine.particles[i].pos.x, engine.particles[i].pos.y, 0);
-        if(len < guiParams.particleDistance) {
-          len = Math.sqrt(len);
-          eff = rotS * (1.0 - (len / guiParams.particleDistance));
-          Raven.Physics.RotationalForce.applyForce(p, dist, len, eff, guiParams.particleRotation);
-        }
+        //len = Raven.distance3D(particle.pos.x, particle.pos.y, 0, nextParticle.pos.x, nextParticle.pos.y, 0);
+        //if(len < guiParams.particleDistance) {
+        //  len = Math.sqrt(len);
+        //  eff = rotS * (1.0 - (len / guiParams.particleDistance));
+        //  Raven.Physics.RotationalForce.applyForce(particle, dist, len, eff, guiParams.particleRotation);
+        //}
       }
     }
   }
@@ -116,18 +119,17 @@ app.update = function() {
 }
 
 app.render = function() {
-  Raven.Canvas.setFillColorRGBA(17, 16, 18, Math.round(guiParams.fadeSpeed * 255));
-  Raven.Canvas.drawRect(0, 0, Raven.View.width, Raven.View.height, true, false);
+  var renderer = this.view.renderer;
+  renderer.setFillRGBA(17, 16, 18, Math.round(guiParams.fadeSpeed * 255));
+  renderer.drawRect(0, 0, this.view.width, this.view.height, true, false);
   
   var connectionAlpha = Math.round(guiParams.connectionOpacity * 255);
-  Raven.Canvas.setStrokeWidth(1);
-  Raven.Canvas.setStrokeColorRGBA(255, 255, 255, connectionAlpha);
+  renderer.setStrokeRGBA(255, 255, 255, connectionAlpha);
   if(guiParams.showForces) {
-    Raven.Canvas.drawCircle(centerGravityForce.pos.x, centerGravityForce.pos.y, centerGravityForce.size * 2, false, true);
-    Raven.Canvas.drawCircle(centerRotationalForce.pos.x, centerRotationalForce.pos.y, centerRotationalForce.size * 2, false, true);
+    renderer.drawCircle(centerGravityForce.pos.x, centerGravityForce.pos.y, centerGravityForce.size * 2, false, true);
   }
   
-  Raven.Canvas.setFillColorRGB(255, 255, 255);
+  renderer.setFillRGB(255, 255, 255);
   
   total = engine.totalParticles();
   var p;
@@ -137,24 +139,23 @@ app.render = function() {
     if(p.pos.distance(p.prev) < 300) { // limit render due to particle wrapping
       
       if(guiParams.showForces) {
-        Raven.Canvas.setStrokeWidth(1);
-        Raven.Canvas.setStrokeColorRGBA(255, 255, 255, connectionAlpha);
-        Raven.Canvas.drawCircle(engine.particles[i].pos.x, engine.particles[i].pos.y, guiParams.particleDistance * 2, false, true);
+        renderer.setStrokeRGBA(255, 255, 255, connectionAlpha);
+        renderer.drawCircle(engine.particles[i].pos.x, engine.particles[i].pos.y, guiParams.particleDistance * 2, false, true);
       }
       
-      Raven.Canvas.setStrokeWidth(guiParams.lineWidth);
-      Raven.Canvas.setStrokeColorRGB(p.col.x, p.col.y, p.col.z);
-      Raven.Canvas.drawLine(p.prev.x, p.prev.y, p.pos.x, p.pos.y);
+      renderer.setFillRGB(p.col.x, p.col.y, p.col.z);
+      renderer.drawCircle(p.pos.x, p.pos.y, guiParams.particleRadius, true, false);
     }
   }
   
-  Raven.Canvas.setFillColorRGB(0, 0, 0);
-  Raven.Canvas.drawRect(20, 20, 100, 30, true, false);
-  Raven.Canvas.setFillColorRGB(255, 255, 255);
-  Raven.Canvas.drawFont("Total Particles: " + total, 25, 35);
+  renderer.setFillRGB(0, 0, 0);
+  renderer.drawRect(20, 20, 100, 30, true, false);
+  renderer.setFillRGB(255, 255, 255);
+  renderer.drawFont("Total Particles: " + total, 25, 35);
 }
 
-app.setup(800, 600); // initial size
+app.setup(800, 600, Raven.View.VIEW_CANVAS); // initial size
+app.view.backgroundColor.set(17, 16, 18);
 app.autoRender();
 
 window.onload = function() {
@@ -164,7 +165,7 @@ window.onload = function() {
   
   // Scene params
   gui.add(guiParams, "fadeSpeed",         0, 1);
-  gui.add(guiParams, "lineWidth",         1,  5);
+  gui.add(guiParams, "particleRadius",    2,  10);
   gui.add(guiParams, "connectionOpacity", 0,  1);
   gui.add(guiParams, "showForces",        guiParams.showForces);
   gui.add(guiParams, "dampening",         0, 0.2);

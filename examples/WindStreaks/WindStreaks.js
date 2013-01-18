@@ -2,10 +2,8 @@
  * Overlapping particles.
  */
 
-Raven.Canvas.setBackgroundColorRGB(0, 0, 0);
-
-function Particle() {
-  this.pos  = new Raven.Vec2(-20, Raven.randRange(-40, Raven.View.height));
+function Particle(x, y) {
+  this.pos  = new Raven.Vec2(x, y);
   this.pPos = this.pos.copy();
   this.vel  = Raven.Vec2.randomRange(1, 1, 3, 5);
   this.yStart = this.pos.y;
@@ -14,19 +12,16 @@ function Particle() {
   this.update = function(frameNum) {
     this.pPos = this.pos.copy();
     this.pos.x += this.vel.x;
-    this.pos.y = this.yStart + Raven.cosRange(Raven.frameNum * this.vel.y, -25, 50);
+    this.pos.y = this.yStart + Raven.cosRange(frameNum * this.vel.y, -25, 50);
   }
   
-  this.render = function() {
-    //Raven.Canvas.drawCircle(this.pos.x, this.pos.y, this.radius-2, true, false);
-    //Raven.Canvas.drawCircle(this.pos.x, this.pos.y, this.radius, false, true);
-    //Raven.Canvas.setStrokeWidth(1);
-    Raven.Canvas.setStrokeColorRGB(0, 0, 0);
-    Raven.Canvas.drawLine(this.pPos.x, this.pPos.y-2, this.pos.x, this.pos.y-2);
-    Raven.Canvas.drawLine(this.pPos.x, this.pPos.y+2, this.pos.x, this.pos.y+2);
+  this.render = function(renderer) {
+    renderer.setStrokeRGB(0, 0, 0);
+    renderer.drawLine(this.pPos.x, this.pPos.y-2, this.pos.x, this.pos.y-2);
+    renderer.drawLine(this.pPos.x, this.pPos.y+2, this.pos.x, this.pos.y+2);
     
-    Raven.Canvas.setStrokeColorRGB(255, 255, 255);
-    Raven.Canvas.drawLine(this.pPos.x, this.pPos.y, this.pos.x, this.pos.y);
+    renderer.setStrokeRGB(255, 255, 255);
+    renderer.drawLine(this.pPos.x, this.pPos.y, this.pos.x, this.pos.y);
   }
   
   this.dead = function() {
@@ -44,22 +39,24 @@ app.supportMobile = true;
 app.autoClear = false;
 
 app.addParticle = function() {
-  particles.push(new Particle());
+  particles.push(new Particle(-20, Raven.randRange(-40, this.view.height)));
 }
 
 app.init = function() {
   this.super.init();
+  console.log(this.isMobile);
   var total = 50;
   if(this.isMobile) {
     total = 10;
     DISPERSE_OFFSET = 25;
     TOTAL_PARTICLES = 150;
   }
+  
   for(var i = 0; i< total; ++i) this.addParticle();
 }
 
 app.update = function() {
-  var num = Raven.frameNum;
+  var num = this.frameNum;
   for(var i = 0; i < particles.length; ++i) {
     p = particles[i];
     p.update(num);
@@ -74,16 +71,17 @@ app.update = function() {
 }
 
 app.render = function() {
-  Raven.Canvas.setFillColorRGBA(0, 0, 0, 4);
-  Raven.Canvas.drawRect(0, 0, Raven.View.width, Raven.View.height, true, false);
+  var renderer = this.view.renderer;
+  renderer.setFillRGBA(0, 0, 0, 4);
+  renderer.drawRect(0, 0, this.view.width, this.view.height, true, false);
   
-  Raven.Canvas.setStrokeWidth(1.5);
-  Raven.Canvas.setFillColorRGBA(0, 0, 0, 32);
-  Raven.Canvas.setStrokeColorRGBA(255, 255, 255, 102);
+  renderer.setFillRGBA(0, 0, 0, 32);
+  renderer.setStrokeRGBA(255, 255, 255, 102);
   var total = particles.length;
-  for(var i = 0; i < total; ++i) particles[i].render();
+  for(var i = 0; i < total; ++i) particles[i].render(renderer);
 }
 
-app.setup(800, 600); // initial size
-app.init();
+app.setup(1024, 768, Raven.View.VIEW_CANVAS);
+app.init(app.view.canvas);
+app.view.backgroundColor.set(16, 16, 16);
 app.autoRender();

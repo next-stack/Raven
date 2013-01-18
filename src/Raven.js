@@ -19,7 +19,9 @@ Raven.checkMobile = function() {
 
 Raven.includeJS("Utils.js");
 Raven.includeJS("Geom.js");
+Raven.includeJS("View.js");
 Raven.includeJS("Canvas.js");
+Raven.includeJS("GL.js");
 Raven.includeJS("Date.js");
 Raven.includeJS("Timer.js");
 Raven.includeJS("Animation.js");

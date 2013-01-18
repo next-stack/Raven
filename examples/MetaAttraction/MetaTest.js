@@ -1,5 +1,3 @@
-Raven.Canvas.setBackgroundColorRGB(255, 255, 255);
-
 var app = Raven.makeInstance(Raven.App);
 app.fullsize = true;
 app.supportMobile = true;
@@ -28,32 +26,32 @@ var engine = new Raven.Physics.ParticleController();
 app.init = function() {
   this.super.init();
   
-  var total = 30;
-  var spacing = Math.ceil(Raven.View.width / (total-1));
-  minH = Raven.View.height - 50;
+  var total = 100;
+  var spacing = Math.ceil(this.view.width / (total-1));
+  minH = this.view.height - 50;
   for(var i = 0; i < total; ++i) {
     points.push(new Point(i * spacing, minH));
   }
 }
 
-app.renderPoints = function() {
+app.renderPoints = function(renderer) {
   var total = points.length-1;
-  
-  Raven.Canvas.setFillColorRGB(0, 0, 0);
+  renderer.setFillRGB(0, 0, 0);
   for(var i = 0; i < total; ++i) this.renderPoint(i);
 }
 
 app.renderPoint = function(index) {
-  Raven.Canvas.begin();
-  Raven.View.context.moveTo(points[index].x, Raven.View.height);
-  Raven.View.context.lineTo(points[index].x,   points[index].y.value);
-  Raven.View.context.lineTo(points[index+1].x, points[index+1].y.value);
-  Raven.View.context.lineTo(points[index+1].x, Raven.View.height);
-  Raven.Canvas.end(true, false, true);
+  var renderer = this.view.renderer;
+  renderer.begin();
+  renderer.context.moveTo(points[index].x,   this.view.height);
+  renderer.context.lineTo(points[index].x,   points[index].y.value);
+  renderer.context.lineTo(points[index+1].x, points[index+1].y.value);
+  renderer.context.lineTo(points[index+1].x, this.view.height);
+  renderer.end(false, true);
 }
 
 app.update = function() {
-  var min = Raven.View.height - 50;
+  var min = this.view.height - 50;
   var d = 0;
   var per = 0;
   var total = points.length;
@@ -73,9 +71,15 @@ app.update = function() {
 }
 
 app.render = function() {
-  this.renderPoints();
+  var renderer = this.view.renderer;
+  this.renderPoints(renderer);
+  
+  renderer.setFillRGB(0, 0, 0);
+  renderer.drawFont("Move your mouse over the floorground.", 25, 25);
+  renderer.drawFont("Press down to increase buldge height.", 25, 40);
 }
 
-app.setup(800, 600); // initial size
+app.setup(800, 600, Raven.View.VIEW_CANVAS); // initial size
+app.view.backgroundColor = Raven.Color.white();
 app.init();
 app.autoRender();

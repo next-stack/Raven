@@ -20,6 +20,11 @@ Raven.Physics.Particle.prototype.constrain = function(min, max) {
   return this;
 }
 
+Raven.Physics.Particle.prototype.inBounds = function(min, max) {
+  this.alive = Raven.inBounds(this.pos.x, this.pos.y, min.x, min.y, max.x, max.y);
+  return this;
+}
+
 Raven.Physics.Particle.prototype.wrap = function(min, max) {
   Raven.wrap3(this.pos, min, max);
   return this;
@@ -132,14 +137,17 @@ Raven.Physics.LinearForce.prototype.update = function(arrList) {
   var eff; // vec3
   var len; // num
   var p; // Particle iterator
+  var dist;
   for(var i = 0; i < total; ++i) {
     p = arrList[i];
-    var dist = p.difference(this);
+    dist = p.difference(this);
     len = dist.length();
+    
     if(len < this.size) {
       len = Math.sqrt(len);
       eff = this.strength * (1.0 - (len / this.size));
       this.applyForce(p, dist, len, eff);
+      
       if(len < 1 && p.movement() < 0.5) p.alive = false; // kill particle if dormant
     }
   }
@@ -171,6 +179,9 @@ Raven.Physics.ParticleController = function() {
   this.forces = [];
   this.particles = [];
   this.time = Raven.Vec3.one();
+  this.minBounds = Raven.Vec3.zero();
+  this.maxBounds = Raven.Vec3.one();
+  this.wrap = true;
 }
 
 Raven.Physics.ParticleController.prototype.addParticle = function(p) {
@@ -183,6 +194,13 @@ Raven.Physics.ParticleController.prototype.addParticlePos = function(x, y, z) {
 
 Raven.Physics.ParticleController.prototype.removeParticle = function(index) {
   this.particles.splice(index, 1);
+}
+
+Raven.Physics.ParticleController.prototype.removeDeadParticles = function() {
+  for(var i = 0; i < this.totalParticles(); ++i) {
+    // || Raven.roundTo(this.particles[i].movement(), 100) == 0
+    if(!this.particles[i].alive) this.removeParticle(i);
+  }
 }
 
 Raven.Physics.ParticleController.prototype.totalParticles = function() {
@@ -207,13 +225,13 @@ Raven.Physics.ParticleController.prototype.update = function() {
     this.forces[i].update(this.particles);
   }
   
-  var minBounds = Raven.Vec2.zero();
-  var maxBounds = new Raven.Vec2(Raven.View.width, Raven.View.height);
-  
   for(i = 0; i < this.totalParticles(); ++i) {
     this.particles[i].update(this.time);
     this.particles[i].dampen(this.dampen);
-    this.particles[i].wrap(minBounds, maxBounds);
-    if(!this.particles[i].alive || Raven.roundTo(this.particles[i].movement(), 100) == 0) this.removeParticle(i);
+    if(this.wrap) {
+      this.particles[i].wrap(this.minBounds, this.maxBounds);
+    } else {
+      this.particles[i].inBounds(this.minBounds, this.maxBounds);
+    }
   }
 }
