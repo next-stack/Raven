@@ -205,7 +205,7 @@ Raven.Interpolation = function() {
   this.value = 0;
   this.velocity = 0;
   
-  this.prototype.update = function() {
+  this.update = function() {
     this.velocity = ((this.target - this.value) * this.speed) + (this.velocity * this.spring);
     this.value += this.velocity;
     if(Raven.distance( this.value, this.target ) < 0.1) {
@@ -246,7 +246,7 @@ Raven.Spritesheet = function(src, totalFrames, frameRate, loop) {
   
   this.img.src = src;
   
-  this.prototype.update = function(appCurrentFrame, appFrameRate) {
+  this.update = function(appCurrentFrame, appFrameRate) {
     if(appCurrentFrame % Math.floor(appFrameRate / this.frameRate) == 0) {
       var next = this.currentFrame + 1;
       if(this.loop) {
@@ -257,7 +257,7 @@ Raven.Spritesheet = function(src, totalFrames, frameRate, loop) {
     }
   }
   
-  this.prototype.render = function(renderer, pos) {
+  this.render = function(renderer, pos) {
     if(!this.loaded) return this;
     
     var cur = this.currentFrame % this.totalFrames;
