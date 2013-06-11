@@ -16,7 +16,7 @@ Raven.Physics.Particle.prototype.reset = function() {
 }
 
 Raven.Physics.Particle.prototype.constrain = function(min, max) {
-  Raven.constrain3(this.pos, min, max);
+  Raven.lerp3(this.pos, min, max);
   return this;
 }
 
@@ -96,14 +96,14 @@ Raven.Physics.Force.applyForce = function(particle, dist, length, effect) {
 }
 
 Raven.Physics.LinearForce.applyForce = function(particle, dist, length, effect, direction, directionStrength) {
-  var phi = Raven.degreesToRadians(direction);
+  var phi = Raven.degToRad(direction);
   particle.vel.x += Math.cos(phi) * effect * directionStrength;
   particle.vel.y += Math.sin(phi) * effect * directionStrength;
   return particle;
 }
 
 Raven.Physics.RotationalForce.applyForce = function(particle, dist, length, effect, rotationStrength) {
-  var phi = Raven.getAngleRad(dist, new Raven.Vec2.zero()) + Raven.degreesToRadians(rotationStrength);
+  var phi = Raven.getAngleRad(dist, new Raven.Vec2.zero()) + Raven.degToRad(rotationStrength);
   particle.vel.x += Math.cos(phi) * effect;
   particle.vel.y += Math.sin(phi) * effect;
   return particle;

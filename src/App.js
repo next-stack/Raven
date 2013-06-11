@@ -4,7 +4,7 @@ Raven.App = function() {
   this.frameNum  = 0;
   this.frameRate = 60;
   this.autoClear = true;
-  this.fullsize = true;
+  this.fullsize = false;
   this.supportMobile = false;
   this.mouseX = -1;
   this.mouseY = -1;
@@ -12,7 +12,6 @@ Raven.App = function() {
   this.touchPoints = [];
   this.isMobile = false;
   this.view = null;
-  this.autoClear = true;
   this.type = null;
   this.canvas = null;
   this.keysDown = {};
@@ -122,21 +121,20 @@ Raven.App.prototype.evtHandler = function(evt) {
     break;
 
     case Raven.DOM.MOUSE_DOWN:
-      handler.mouseX = evt.clientX;
-      handler.mouseY = evt.clientY;
+      handler.mouseX = evt.clientX - evt.target.offsetLeft + window.scrollX;
+      handler.mouseY = evt.clientY - evt.target.offsetTop  + window.scrollY;
       handler.isMousePressed = true;
-      handler.mouseDown(evt.clientX, evt.clientY);
+      handler.mouseDown(handler.mouseX, handler.mouseY);
     break;
 
     case Raven.DOM.MOUSE_MOVE:
-      handler.mouseX = evt.clientX;
-      handler.mouseY = evt.clientY;
-      handler.mouseMove(evt.clientX, evt.clientY);
-      //if(evt.clientX < handler.view.width && evt.clientY < handler.view.height) {
+      handler.mouseX = evt.clientX - evt.target.offsetLeft;
+      handler.mouseY = evt.clientY - evt.target.offsetTop;
+      handler.mouseMove(handler.mouseX, handler.mouseY);
     break;
 
     case Raven.DOM.MOUSE_UP:
-      handler.mouseUp(evt.clientX, evt.clientY);
+      handler.mouseUp(evt.clientX - evt.target.offsetLeft, evt.clientY - evt.target.offsetTop);
       handler.mouseX = -1;
       handler.mouseY = -1;
       handler.isMousePressed = false;
@@ -151,12 +149,7 @@ Raven.App.prototype.updateHandler = function() {
 }
 
 Raven.App.prototype.renderHandler = function() {
-  if(Raven.AppHandler.autoClear) {
-    Raven.AppHandler.view.clear();
-  }
-  if(Raven.AppHandler.view.type == Raven.View.VIEW_GL) {
-    Raven.AppHandler.view.render(Raven.AppHandler.view.width, Raven.AppHandler.view.height);
-  }
+  Raven.AppHandler.view.render(Raven.AppHandler.autoClear);
   Raven.AppHandler.render();
 }
 
@@ -179,11 +172,11 @@ Raven.App.prototype.resize = function(wid, hei) {
   Raven.AppHandler.view.resize(wid, hei);
 }
 
-Raven.App.prototype.setup = function(wid, hei, rendererType, settings) {
-  Raven.AppHandler.canvas = Raven.DOM.getElemID('world');
+Raven.App.prototype.setup = function(wid, hei, canvas, rendererType, settings, enableRetina) {
+  Raven.AppHandler.canvas = canvas;
   Raven.AppHandler.view = new Raven.View();
-  Raven.AppHandler.view.init(Raven.AppHandler.canvas, rendererType, settings ? settings : {}, this.enableRetina);
-  Raven.AppHandler.view.resize(wid, hei);
+  Raven.AppHandler.view.init(Raven.AppHandler.canvas, rendererType, settings ? settings : {}, enableRetina != null ? enableRetina : false);
+  Raven.AppHandler.resize(wid, hei);
 }
 
 Raven.App.prototype.init = function() {

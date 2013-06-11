@@ -10,7 +10,6 @@ function Point(px, py) {
   this.y.speed = 0.25;
   this.y.spring = 0.65;
   this.y.autoDispose = false;
-  this.y.start();
   
   this.update = function() {
     this.y.update();
@@ -47,7 +46,7 @@ app.renderPoint = function(index) {
   renderer.context.lineTo(points[index].x,   points[index].y.value);
   renderer.context.lineTo(points[index+1].x, points[index+1].y.value);
   renderer.context.lineTo(points[index+1].x, this.view.height);
-  renderer.end(false, true);
+  renderer.end(true, false);
 }
 
 app.update = function() {
@@ -61,7 +60,7 @@ app.update = function() {
     d = Raven.distance2D(points[i].x, min, this.mouseX, this.mouseY);
     if(d < maxDist) {
       if(this.mouseY >= min) d = Raven.distance(points[i].x, this.mouseX);
-      per = (d / maxDist);
+      per = d / maxDist;
       points[i].y.target = Raven.Ease.cubicInOut(per, min - maxDist, maxDist, 1);
     } else {
       points[i].y.target = min;
@@ -79,7 +78,8 @@ app.render = function() {
   renderer.drawFont("Press down to increase buldge height.", 25, 40);
 }
 
-app.setup(800, 600, Raven.View.VIEW_CANVAS); // initial size
+app.setup(800, 600, Raven.element("world"), Raven.View.VIEW_CANVAS);
 app.view.backgroundColor = Raven.Color.white();
 app.init();
 app.autoRender();
+

@@ -109,6 +109,10 @@ Raven.Vec2.random = function(px, py) {
   return new Raven.Vec2(Math.random() * px, Math.random() * py);
 }
 
+Raven.Vec2.range = function(minV, maxV, value) {
+  return new Raven.Vec2(Raven.range(minV.x, maxV.x, value), Raven.range(minV.y, maxV.y, value));
+}
+
 Raven.Vec2.randomRange = function(minX, minY, maxX, maxY) {
   return new Raven.Vec2(Raven.randRange(minX, maxX), Raven.randRange(minY, maxY));
 }
@@ -221,8 +225,6 @@ Raven.Vec3 = function(px, py, pz) {
   return this;
 }
 
-
-
 Raven.Vec3.zero = function() {
   return new Raven.Vec3(0, 0, 0);
 }
@@ -235,8 +237,45 @@ Raven.Vec3.random = function(px, py, pz) {
   return new Raven.Vec3(Math.random() * px, Math.random() * py, Math.random() * pz);
 }
 
+Raven.Vec3.range = function(minV, maxV, value) {
+  return new Raven.Vec3(Raven.range(minV.x, maxV.x, value), Raven.range(minV.y, maxV.y, value), Raven.range(minV.z, maxV.z, value));
+}
+
 Raven.Vec3.randomRange = function(minX, minY, minZ, maxX, maxY, maxZ) {
   return new Raven.Vec3(Raven.randRange(minX, maxX), Raven.randRange(minY, maxY), Raven.randRange(minZ, maxZ));
+}
+
+Raven.Rect = function(x, y, width, height) {
+  
+  this.x = x;
+  this.y = y;
+  this.width  = width;
+  this.height = height;
+  
+  this.left = function() {
+    return this.x;
+  }
+  
+  this.top = function() {
+    return this.y;
+  }
+  
+  this.right = function() {
+    return this.x + this.width;
+  }
+  
+  this.bottom = function() {
+    return this.y + this.height;
+  }
+  
+  this.collision = function(x, y) {
+    return Raven.inBounds(x, y, this.x, this.y, this.right(), this.bottom());
+  }
+
+  this.overlap = function(x, y, width, height) {
+    return this.collision(x, y) || this.collision(x+width, y+height);
+  }
+  
 }
 
 Raven.Matrix = function() {
@@ -255,7 +294,7 @@ Raven.Matrix = function() {
   }
   
   this.multiply = function(srcA, srcB) {
-      var tmp = new ESMatrix();
+      var tmp = new Raven.Matrix();
       var i;
       for (i=0; i<4; i++) {
           tmp.m[i][0] =	(srcA.m[i][0] * srcB.m[0][0]) +
@@ -349,11 +388,11 @@ Raven.Matrix = function() {
 
      this.frustum(-frustumW, frustumW, -frustumH, frustumH, nearZ, farZ);
   }
-
+  
   this.rotate = function(angle, x, y, z) {
     var len = Math.sqrt(x*x + y*y + z*z);
     if(len > 0) {
-      var rad = Raven.toRadians(angle);
+      var rad = angle * Raven.RADIANS;
       var sinA, cosA;
       cosA = Math.cos(rad);
       sinA = Math.sin(rad);
@@ -423,39 +462,312 @@ Raven.Matrix = function() {
     this.m[3][3] += this.m[0][3] * tx + this.m[1][3] * ty + this.m[2][3] * tz;
   }
   
-}
-
-
-
-Raven.Rect = function(x, y, width, height) {
-  this.x = x;
-  this.y = y;
-  this.width  = width;
-  this.height = height;
-  
-  this.left = function() {
-    return this.x;
+  this.getCSS = function() {
+    var style = "matrix(";
+    style += this.m[0][0] + ",";
+    style += this.m[0][1] + ",";
+    
+    style += this.m[1][0] + ",";
+    style += this.m[1][1] + ",";
+    
+    style += this.m[3][0] + ",";
+    style += this.m[3][1] + ")";
+    return style;
   }
   
-  this.top = function() {
-    return this.y;
-  }
-  
-  this.right = function() {
-    return this.x + this.width;
-  }
-  
-  this.bottom = function() {
-    return this.y + this.height;
-  }
-  
-  this.collision = function(x, y) {
-    return Raven.inBounds(x, y, this.x, this.y, this.right(), this.bottom());
-  }
-
-  this.overlap = function(x, y, width, height) {
-    return this.collision(x, y) || this.collision(x+width, y+height);
-  }
+  this.loadIdentity();
   
 }
 
+Raven.Matrix3D = function() {
+  var _this = this,
+  mat = [];
+  
+  this.reset = function() {
+    mat = [
+      [1, 0, 0, 0],
+      [0, 1, 0, 0],
+      [0, 0, 1, 0],
+      [0, 0, 0, 1]
+    ];
+    return this;
+  }
+  
+  this.css = function() {
+    var f = 6,
+    s = 'matrix3d(';
+    s += mat[0][0].toFixed(f) + ', ';
+    s += mat[0][1].toFixed(f) + ', ';
+    s += mat[0][2].toFixed(f) + ', ';
+    s += mat[0][3].toFixed(f) + ', ';
+    s += mat[1][0].toFixed(f) + ', ';
+    s += mat[1][1].toFixed(f) + ', ';
+    s += mat[1][2].toFixed(f) + ', ';
+    s += mat[1][3].toFixed(f) + ', ';
+    s += mat[2][0].toFixed(f) + ', ';
+    s += mat[2][1].toFixed(f) + ', ';
+    s += mat[2][2].toFixed(f) + ', ';
+    s += mat[2][3].toFixed(f) + ', ';
+    s += mat[3][0].toFixed(f) + ', ';
+    s += mat[3][1].toFixed(f) + ', ';
+    s += mat[3][2].toFixed(f) + ', ';
+    s += mat[3][3].toFixed(f) + ')';
+    return s;
+  }
+  
+  this.rotateX = function(angle) {
+    var rad = Raven.degToRad(angle);
+    mat[1][1] *= Math.cos( rad);
+    mat[1][2] *= Math.sin(-rad);
+    mat[2][1] *= Math.sin( rad);
+    mat[2][2] *= Math.cos( rad);
+    return this;
+  }
+  
+  this.rotateY = function(angle) {
+    var rad = Raven.degToRad(angle);
+    mat[0][0] *= Math.cos( rad);
+    mat[0][2] *= Math.sin( rad);
+    mat[2][0] *= Math.sin(-rad);
+    mat[2][2] *= Math.cos( rad);
+    return this;
+  }
+  
+  this.rotateZ = function(angle) {
+    var rad = Raven.degToRad(angle);
+    mat[0][0] *= Math.cos( rad);
+    mat[0][1] *= Math.sin(-rad);
+    mat[1][0] *= Math.sin( rad);
+    mat[1][2] *= Math.cos( rad);
+    return this;
+  }
+  
+  this.rotate = function(x, y, z) {
+    return this.rotateX(x).rotateY(y).rotateZ(z);
+  }
+  
+  this.scale = function(x, y, z) {
+    mat[0][0] *= x ? x : 1;
+    mat[1][1] *= y ? y : 1;
+    mat[2][2] *= z ? z : 1;
+    return this;
+  }
+  
+  this.translate = function(x, y, z) {
+    if(x) mat[3][0] = x;
+    if(y) mat[3][1] = y;
+    if(z) mat[3][2] = z;
+    return this;
+  }
+  
+  return this.reset();
+}
+
+Raven.Matrix2D = function() {
+  
+  this.a = 1;
+  this.b = 0;
+  this.c = 0;
+  this.d = 1;
+  this.tx = 0;
+  this.ty = 0;
+  
+  this.identity = function() {
+    this.a = this.d = 1;
+    this.b = this.c = this.tx = this.ty = 0;
+  }
+  
+  this.rotate = function(angle) {
+    var rad = angle * Raven.RADIANS;
+    var cos = Math.cos(rad);
+    var sin = Math.sin(rad);
+    var a1 = this.a;
+    var c1 = this.c;
+    var tx1 = this.tx;
+
+    this.a = a1*cos-this.b*sin;
+    this.b = a1*sin+this.b*cos;
+    this.c = c1*cos-this.d*sin;
+    this.d = c1*sin+this.d*cos;
+    return this;
+  }
+  
+  this.scale = function(x, y) {
+    this.a *= x;
+    this.d *= y;
+    this.tx *= x;
+    this.ty *= y;
+    return this;
+  }
+  
+  this.translate = function(x, y) {
+    this.tx += x;
+    this.ty += y;
+    return this;
+  }
+  
+  this.getCSS = function() {
+    var style = "matrix(";
+    style += this.a + ",";
+    style += this.b + ",";
+    style += this.c + ",";
+    style += this.d + ",";
+    style += this.tx + ",";
+    style += this.ty + ")";
+    return style;
+  }
+  
+}
+
+Raven.QuadBezier = function(p0, c0, c1, p1) {
+    this.p0 = p0;
+    this.c0 = c0;
+    this.c1 = c1;
+    this.p1 = p1;
+    
+    this.getValue = function(time) {
+      var vel = Raven.Vec2.zero();
+      vel.x = Raven.bezierPosition(time, this.p0.x, this.c0.x, this.c1.x, this.p1.x);
+      vel.y = Raven.bezierPosition(time, this.p0.y, this.c0.y, this.c1.y, this.p1.y);
+      return vel;
+    }
+    
+    this.getVel = function(time) {
+      var vel = Raven.Vec2.zero();
+      vel.x = Raven.bezierVelocity(time, this.p0.x, this.c0.x, this.c1.x, this.p1.x);
+      vel.y = Raven.bezierVelocity(time, this.p0.y, this.c0.y, this.c1.y, this.p1.y);
+      return vel;
+    }
+}
+
+/**
+ * Adapted from Bartek Drozdz's kickass library Squareroot.js
+ * https://github.com/drojdjou/squareroot.js
+ */
+Raven.Spline = function(s1, s2, s3, s4) {
+    var that = this;
+
+    this.rawPoints = [];
+    this.controlPoints = [];
+
+    var numSegments = 0;
+    var numRawPoints = 0;
+    var closed = false;
+    
+    this.segments = function() {
+      return numSegments;
+    }
+    
+    this.points = function() {
+      return numRawPoints;
+    }
+    
+    var findMidpoint = function(a, b) {
+      return Raven.Vec2.range(a, b, 0.5);
+    }
+
+    var interpolate = function(t, func) {
+        var s, st;
+        var cs = that.controlPoints;
+
+        s = Math.floor(t * numSegments)
+        st = (t * numSegments) - s;
+
+        if (s == cs.length / 4) {
+            s = Math.max(0, s - 1);
+            st = 1;
+        }
+
+        s *= 4;
+
+        var v = Raven.Vec2.zero();
+        v.x = func(st, cs[s + 0].x, cs[s + 1].x, cs[s + 2].x, cs[s + 3].x);
+        v.y = func(st, cs[s + 0].y, cs[s + 1].y, cs[s + 2].y, cs[s + 3].y);
+        return v;
+    }
+
+    this.valueAt = function(t) {
+        return interpolate(t, Raven.bezierPosition);
+    }
+
+    this.velocityAt = function(t) {
+        return interpolate(t, Raven.bezierVelocity);
+    }
+    
+    this.addP = function(p) {
+      this.rawPoints.push(p);
+      this.controlPoints.push(p);
+      numRawPoints = this.rawPoints.length;
+    }
+
+    this.add = function(p1, p2) {
+        this.addP(p1);
+        this.addP(p2);
+        this.calculateControlPoints();
+    }
+
+    this.closePath = function() {
+        closed = true;
+        this.calculateControlPoints();
+    }
+
+    this.calculate = function() {
+        if (numRawPoints < 4 || numRawPoints % 2 == 1) {
+            throw "Spline is corrupt - illegal number of points (should be an even number and >= 4)";
+        }
+
+        this.controlPoints = [];
+        numSegments = 1;
+
+        for (var i = 0; i < numRawPoints; i++) {
+
+            var r = this.rawPoints[i];
+
+            if (i < 3) {
+
+                if (closed && i == 0) {
+                    var l = this.rawPoints[i + 1];
+                    var m = findMidpoint(l, r);
+                    this.controlPoints.push(m);
+                } else {
+                    this.controlPoints.push(r);
+                }
+
+                continue;
+            }
+
+            if (i >= 3 && i % 2 == 0) {
+                this.controlPoints.push(r);
+                continue;
+            }
+
+            if (i >= 3 && i % 2 == 1 && i == numRawPoints - 1 && !closed) {
+                this.controlPoints.push(r);
+                continue;
+            }
+
+            if (i >= 3 && i % 2 == 1 && i < numRawPoints - 1) {
+                var l = this.rawPoints[i - 1];
+                var m = findMidpoint(r, l);
+                this.controlPoints.push(m, m, r);
+                numSegments++;
+                continue;
+            }
+        }
+
+        if (closed) {
+            var beflast = this.rawPoints[this.rawPoints.length-2];
+            var last = this.rawPoints[this.rawPoints.length-1];
+
+            var first = this.rawPoints[0];
+            var second = this.rawPoints[1];
+
+            var m1 = findMidpoint(last, beflast);
+            var m2 = findMidpoint(first, second);
+
+            this.controlPoints.push(m1, m1, last, first, m2);
+
+            numSegments++;
+        }
+    }
+}

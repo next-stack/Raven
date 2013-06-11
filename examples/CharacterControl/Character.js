@@ -8,7 +8,6 @@ function Character() {
   this.direction.autoDispose = false;
   this.direction.speed = 0.5;
   this.direction.spring = 0;
-  this.direction.start();
   
   var maxWidth = 40;
   var maxHeight = 68;
@@ -37,7 +36,7 @@ function Character() {
   var MAX_JUMP = 2;
   var jumpsLeft = MAX_JUMP;
   
-  var state_jumping = new Raven.FrameCountdown(15); // delay the jump to secure the velocity doesn't go NUTS
+  var state_jumping = new Raven.FrameCounter(15); // delay the jump to secure the velocity doesn't go NUTS
   
   this.getStatus = function() {
     var _stateNames = ["STAND", "DUCK", "WALK", "RUN", "JUMP"];

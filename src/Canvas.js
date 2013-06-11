@@ -31,6 +31,11 @@ Raven.Canvas = function(context) {
     _fillColor = c.copy();
     this.context.fillStyle = _fillColor.css();
   }
+
+  this.setFillHex = function(hex) {
+    _fillColor = Raven.Color.hexToRGB(hex);
+    this.context.fillStyle = _fillColor.css();
+  }
   
   this.setFillRGBA = function(r, g, b, a) {
     _fillColor = new Raven.Color(r, g, b, a);
@@ -43,6 +48,11 @@ Raven.Canvas = function(context) {
   
   this.setStrokeColor = function(c) {
     _strokeColor = c.copy();
+    this.context.strokeStyle = _strokeColor.css();
+  }
+
+  this.setStrokeHex = function(hex) {
+    _strokeColor = Raven.Color.hexToRGB(hex);
     this.context.strokeStyle = _strokeColor.css();
   }
   
@@ -70,22 +80,21 @@ Raven.Canvas = function(context) {
 
   this.drawLine = function(x1, y1, x2, y2) {
     this.begin();
-    this.context.moveTo(x1, y1);
-    this.context.lineTo(x2, y2);
+    this.moveTo(x1, y1);
+    this.lineTo(x2, y2);
     this.end(true, false);
   }
   
   this.drawCurve = function(start, control, end, stroke, fill) {
     this.begin();
-    this.context.moveTo(start.x, start.y);
+    this.moveTo(start.x, start.y);
     this.context.quadraticCurveTo(control.x, control.y, end.x, end.y);
     this.end(stroke, fill);
   }
 
   this.drawRect = function(x, y, wid, hei, fill, stroke) {
-    this.context.fillRect(x, y, wid, hei);
-    if(stroke) this.context.stroke();
-    if(fill) this.context.fill();
+    if(stroke) this.context.strokeRect(x, y, wid, hei);
+    if(fill) this.context.fillRect(x, y, wid, hei);
   }
   
   this.clear = function(width, height, backgroundColor) {
@@ -97,8 +106,16 @@ Raven.Canvas = function(context) {
     this.context.beginPath();
   }
   
+  this.moveTo = function(x, y) {
+    this.context.moveTo(x, y);
+  }
+  
+  this.lineTo = function(x, y) {
+    this.context.lineTo(x, y);
+  }
+  
   this.end = function(stroke, fill) {
-    this.context.closePath();
+    //this.context.closePath();
     if(stroke) this.context.stroke();
     if(fill)   this.context.fill();
   }

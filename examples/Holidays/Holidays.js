@@ -45,9 +45,11 @@ app.render = function() {
     graphics.drawCircle(particles[i].pos.x, particles[i].pos.y, particles[i].size, true);
   }
   
-  graphics.drawFont("Happy Holidays!", 25, 25);
+  graphics.drawFont("Happy Holidays!", 50, 50);
 }
 
-app.setup(window.innerWidth, 940, Raven.View.VIEW_CANVAS);
+app.setup(window.innerWidth, 940, Raven.element("world"), Raven.View.VIEW_CANVAS);
 app.init(app.view.canvas);
 app.autoRender();
+
+

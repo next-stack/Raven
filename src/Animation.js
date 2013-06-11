@@ -1,5 +1,23 @@
 var Raven = Raven || {};
 
+// A linear counter
+Raven.FrameCounter = function(totalFrames) {
+  this.currentFrame = 0;
+  this.totalFrames = totalFrames ? totalFrames : 0;
+  
+  this.restart = function() {
+    this.currentFrame = this.totalFrames;
+  }
+  
+  this.update = function() {
+    if(this.currentFrame > 0) --this.currentFrame;
+  }
+  
+  this.active = function() {
+    return this.currentFrame > 0;
+  }
+}
+
 // Penner easing types available for Cubic easing
 var Penner = {
   "Linear": 0,
@@ -403,7 +421,7 @@ CubicEase.getPenner = function(ease) {
   return cEase;
 }
 
-function Tween(target, key, to, duration, ease, delay) {
+function Tween(target, key, to, duration, ease, delay, updateHandler, completeHandler) {
   var _this = this,
   active = false;
   
@@ -412,9 +430,15 @@ function Tween(target, key, to, duration, ease, delay) {
 	this.to = to;
 	this.duration = duration * 1000;
 	this.timestamp = new Date().getTime() + (delay ? delay * 1000 : 0);
+  this.updateHandler = updateHandler;
+  this.completeHandler = completeHandler;
 	
 	this.start = function() { this.from = target[key]; }
-	this.complete = function() { target[key] = to; return this; }
+	this.complete = function() {
+    target[key] = to;
+    if(this.completeHandler) this.completeHandler();
+    return this;
+  }
 	
 	this.update = function(percent) {
 	  if(!active) {
@@ -422,6 +446,7 @@ function Tween(target, key, to, duration, ease, delay) {
 	    this.from = target[key];
 	  }
 	  target[key] = ease.getCurvePercent(percent) * this.range() + this.from;
+    if(this.updateHandler) this.updateHandler();
 	  return this;
 	}
 	
@@ -450,14 +475,14 @@ function TweenController() {
   
   this.totalTweens = function() { return tweens.length; }
   
-  this.addTween = function(target, key, to, duration, x0, y0, x1, y1, delay) {
+  this.addTween = function(target, key, to, duration, x0, y0, x1, y1, delay, updateHandler, completeHandler) {
     var ease = new CubicEase().set(x0, y0, x1, y1);
-    tweens.push( new Tween(target, key, to, duration, ease, delay) );
+    tweens.push( new Tween(target, key, to, duration, ease, delay, updateHandler, completeHandler) );
     return this;
   }
   
-  this.addPenner = function(target, key, to, duration, penner, delay) {
-    tweens.push( new Tween(target, key, to, duration, CubicEase.getPenner(penner), delay) );
+  this.addPenner = function(target, key, to, duration, penner, delay, updateHandler, completeHandler) {
+    tweens.push( new Tween(target, key, to, duration, CubicEase.getPenner(penner), delay, updateHandler, completeHandler) );
     return this;
   }
   

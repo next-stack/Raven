@@ -11,7 +11,7 @@ var params = {
 
 var app = Raven.makeInstance(Raven.App);
 app.fullsize = true;
-app.setup(480, 320, Raven.View.VIEW_CANVAS);
+app.setup(480, 320, Raven.element("world"), Raven.View.VIEW_CANVAS);
 app.floor = 768 - params.floorHeight;
 app.camera = Raven.Vec2.zero();
 
@@ -26,8 +26,6 @@ app.touchDown = function(id, mx, my) {
   var touches = this.touchPoints.length;
   if(touches == 1) {
     hero.jump(params.jumpHeight);
-  } else if(touches == 2) {
-    hero.attack();
   }
 }
 
@@ -95,6 +93,8 @@ app.render = function() {
 app.renderBackground = function(graphics) {
   graphics.setFillRGB(102, 102, 102);
   graphics.drawRect(-this.camera.x, this.floor+this.camera.y, this.view.width, this.view.height - this.floor);
+  graphics.setFillHex("#40B27E");
+  graphics.drawRect(0, this.floor, this.view.width, this.view.height-params.floorHeight, true);
 }
 
 app.renderMiddleGround = function(graphics) {

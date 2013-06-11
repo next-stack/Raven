@@ -81,7 +81,8 @@ app.render = function() {
   for(var i = 0; i < total; ++i) particles[i].render(renderer);
 }
 
-app.setup(1024, 768, Raven.View.VIEW_CANVAS);
+app.setup(1024, 768, Raven.element("world"), Raven.View.VIEW_CANVAS);
 app.init(app.view.canvas);
 app.view.backgroundColor.set(16, 16, 16);
 app.autoRender();
+

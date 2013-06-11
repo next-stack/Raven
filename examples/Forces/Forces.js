@@ -154,7 +154,7 @@ app.render = function() {
   renderer.drawFont("Total Particles: " + total, 25, 35);
 }
 
-app.setup(800, 600, Raven.View.VIEW_CANVAS); // initial size
+app.setup(800, 600, Raven.element("world"), Raven.View.VIEW_CANVAS);
 app.view.backgroundColor.set(17, 16, 18);
 app.autoRender();
 

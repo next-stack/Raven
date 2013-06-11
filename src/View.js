@@ -126,7 +126,7 @@ Raven.View = function() {
         break;
       }
     } else {
-      console.log("Error establishing canvas (Raven.GL.init)", this.type);
+      console.log("Error establishing canvas", this.type);
     }
   }
   

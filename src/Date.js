@@ -139,3 +139,7 @@ Raven.Date.getCurrentMinute = function() {
 Raven.Date.getCurrentSecond = function() {
   return Raven.Date.dateInstance.seconds;
 }
+
+Raven.Date.getCurrentMS = function() {
+  return Raven.Date.dateInstance.milliseconds;
+}

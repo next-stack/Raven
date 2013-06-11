@@ -12,11 +12,11 @@ Raven.resolveAngle = function( angle ) {
   return mod < 0 ? 360 + mod : mod;
 }
 
-Raven.degreesToRadians = function( degrees ) {
+Raven.degToRad = function( degrees ) {
   return Raven.resolveAngle(degrees) * Raven.RADIANS;
 }
 
-Raven.radiansToDegrees = function( radians ) {
+Raven.radToDeg = function( radians ) {
   return Raven.resolveAngle(radians * Raven.DEGREES);
 }
 
@@ -25,7 +25,7 @@ Raven.getAngleRad = function (p1, p2) {
 }
 
 Raven.getAngleDeg = function(p1, p2) {
-  return Raven.radiansToDegrees(Raven.getAngleRad(p1, p2));
+  return Raven.radToDeg(Raven.getAngleRad(p1, p2));
 }
 
 Raven.distance = function(n1, n2) {
@@ -50,12 +50,16 @@ Raven.difference = function(n1, n2) {
   return n1 - n2;
 }
 
+/**
+ * @param n1 Preferrably the minimum value.
+ * @param n2 Preferrably the maximum value.
+ * @param percent A number ranging from 0-1.
+ * @return Number The range designated.
+ */
 Raven.range = function(n1, n2, percent) {
-  var min  = Math.min(n1, n2);
-  var max  = Math.max(n1, n2);
-  var diff = max - min;
+  var diff = n2 - n1;
   diff *= percent;
-  return diff + min;
+  return diff + n1;
 }
 
 Raven.randRange = function(min, max) {
@@ -63,7 +67,7 @@ Raven.randRange = function(min, max) {
 }
 
 Raven.cosRange = function(degrees, range, min) {
-  return (((1 + Math.cos(Raven.degreesToRadians(degrees))) * 0.5) * range) + min;
+  return (((1 + Math.cos(Raven.degToRad(degrees))) * 0.5) * range) + min;
 }
 
 Raven.between = function(min, max, value) {
@@ -74,11 +78,24 @@ Raven.inBounds = function(x, y, xMin, yMin, xMax, yMax) {
   return Raven.between(xMin, xMax, x) && Raven.between(yMin, yMax, y);
 }
 
-Raven.constrain = function(value, min, max) {
-	return Math.min(min, Math.max(max, value));
+Raven.bezierPosition = function(t, p0, c0, c1, p1) {
+  return p0*(1-t)*(1-t)*(1-t)+c0*3*t*(1-t)*(1-t)+c1*3*t*t*(1-t)+p1*t*t*t;
 }
 
-Raven.constrain2 = function(value, min, max) {
+Raven.bezierVelocity = function(t, p0, c0, c1, p1) {
+  return (3*c0-3*p0)+2*(3*p0-6*c0+3*c1)*t+3*(-p0+3*c0-3*c1+p1)*t*t;
+}
+
+Raven.lerp = function(value, min, max) {
+  if(value < min) {
+    value = min;
+  } else if(value > max) {
+    value = max;
+  }
+  return value;
+}
+
+Raven.lerp2 = function(value, min, max) {
   if(value.x < min.x) {
     value.x = min.x;
   } else if(value.x > max.x) {
@@ -92,8 +109,8 @@ Raven.constrain2 = function(value, min, max) {
   }
 }
 
-Raven.constrain3 = function(value, min, max) {
-  Raven.constrain2(value, min, max);
+Raven.lerp3 = function(value, min, max) {
+  Raven.lerp2(value, min, max);
   
   if(value.z < min.z) {
     value.z = min.z;
@@ -125,6 +142,14 @@ Raven.wrap3 = function(value, min, max) {
   return value;
 }
 
+Raven.bezierPosition = function(t, p0, c0, c1, p1) {
+  return p0*(1-t)*(1-t)*(1-t)+c0*3*t*(1-t)*(1-t)+c1*3*t*t*(1-t)+p1*t*t*t;
+}
+
+Raven.bezierVelocity = function(t, p0, c0, c1, p1) {
+  return (3*c0-3*p0)+2*(3*p0-6*c0+3*c1)*t+3*(-p0+3*c0-3*c1+p1)*t*t;
+}
+
 // DOM
 
 Raven.DOM = function() {
@@ -150,6 +175,7 @@ Raven.DOM.KEY_UP = "keyup";
 Raven.DOM.DRAG_START = "dragstart";
 Raven.DOM.DRAG = "drag";
 Raven.DOM.DRAG_END = "dragend";
+Raven.DOM.DROP = "drop";
 
 Raven.DOM.TOUCH_DOWN = "touchstart";
 Raven.DOM.TOUCH_MOVE = "touchmove";
@@ -176,14 +202,25 @@ Raven.DOM.unwatch = function(target, event, handler) {
 
 Raven.DOM.watchID = function(domID, event, handler) {
   var target = Raven.DOM.getElemID(domID);
-  if(!target) return;
-  target[event] = function(){ handler(domID); return false; };
+  if(target != null) Raven.DOM.watch(target, event, handler);
 }
 
 Raven.DOM.unwatchID = function(domID, event) {
   var target = Raven.DOM.getElemID(domID);
-  if(!target) return;
-  target[event] = null;
+  if(target != null) Raven.DOM.unwatch(target, event, handler);
+}
+
+Raven.DOM.setStyle = function(target, style) {
+  target.style["transform"] = style;
+          target.style["transform"] = style;
+       target.style["-o-transform"] = style;
+      target.style["-ms-transform"] = style;
+     target.style["-moz-transform"] = style;
+  target.style["-webkit-transform"] = style;
+}
+
+Raven.transform = function(elem, x, y) {
+  Raven.DOM.setStyle(elem, 'translate(' + x + 'px, ' + y + 'px)');
 }
 
 // Key map
@@ -250,39 +287,10 @@ var Key = {
   NUMBER_8: 56,
   NUMBER_9: 57,
   
-  "getKey": function(keyCode) {
+  getKey: function(keyCode) {
     for(var obj in this) {
       if(this[obj] == keyCode) return obj;
     }
     return null;
   }
 };
-
-// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
-
-// requestAnimationFrame polyfill by Erik Möller
-// fixes from Paul Irish and Tino Zijdel
-
-(function() {
-  var lastTime = 0;
-  var vendors = ['ms', 'moz', 'webkit', 'o'];
-  for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-    window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
-    window.cancelAnimationFrame = window[vendors[x]+'CancelAnimationFrame']
-    || window[vendors[x]+'CancelRequestAnimationFrame'];
-  }
-
-  if (!window.requestAnimationFrame) window.requestAnimationFrame = function(callback, element) {
-    var currTime = new Date().getTime();
-    var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-    var id = window.setTimeout(function() { callback(currTime + timeToCall); }, 
-    timeToCall);
-    lastTime = currTime + timeToCall;
-    return id;
-  };
-
-  if (!window.cancelAnimationFrame) window.cancelAnimationFrame = function(id) {
-    clearTimeout(id);
-  };
-}());
