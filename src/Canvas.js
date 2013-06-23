@@ -66,8 +66,9 @@ Raven.Canvas = function(context) {
   }
   
   this.drawCircle = function(x, y, radius, fill, stroke) {
+    var hr = radius * 0.5;
     this.context.beginPath();
-    this.context.arc(x, y, radius * 0.5, 0, Math.PI * 2, false);
+    this.context.arc(x + hr, y + hr, hr, 0, Math.PI * 2, false);
     this.context.closePath();
     if(stroke) this.context.stroke();
     if(fill) this.context.fill();

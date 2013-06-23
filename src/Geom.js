@@ -20,59 +20,51 @@ Raven.Vec2 = function(px, py) {
   }
 
   this.add = function(vec) {
-    var v = this.copy();
-    v.x += vec.x;
-    v.y += vec.y;
-    return v;
+    this.x += vec.x;
+    this.y += vec.y;
+    return this;
   }
 
   this.addN = function(value) {
-    var v = this.copy();
-    v.x += value;
-    v.y += value;
-    return v;
+    this.x += value;
+    this.y += value;
+    return this;
   }
 
   this.subtract = function(vec) {
-    var v = this.copy();
-    v.x -= vec.x;
-    v.y -= vec.y;
-    return v;
+    this.x -= vec.x;
+    this.y -= vec.y;
+    return this;
   }
 
   this.subtractN = function(value) {
-    var v = this.copy();
-    v.x -= value;
-    v.y -= value;
-    return v;
+    this.x -= value;
+    this.y -= value;
+    return this;
   }
 
   this.multiply = function(vec) {
-    var v = this.copy();
     v.x *= vec.x;
     v.y *= vec.y;
-    return v;
+    return this;
   }
 
   this.multiplyN = function(value) {
-    var v = this.copy();
-    v.x *= value;
-    v.y *= value;
-    return v;
+    this.x *= value;
+    this.y *= value;
+    return this;
   }
 
   this.divide = function(vec) {
-    var v = this.copy();
-    v.x /= vec.x;
-    v.y /= vec.y;
-    return v;
+    this.x /= vec.x;
+    this.y /= vec.y;
+    return this;
   }
 
   this.divideN = function(value) {
-    var v = this.copy();
-    v.x /= value;
-    v.y /= value;
-    return v;
+    this.x /= value;
+    this.y /= value;
+    return this;
   }
 
   this.equals = function(vec) {
