@@ -236,6 +236,28 @@ Raven.Interpolation = function() {
   return this;
 };
 
+Raven.Interpolation2D = function(x, y) {
+  this.speed  = 0.5;
+  this.spring = 0;
+  this.target = new Raven.Vec2(x, y);
+  this.value  = new Raven.Vec2(x, y);
+  this.velocity = new Raven.Vec2();
+  
+  this.update = function() {
+    this.velocity.x = ((this.target.x - this.value.x) * this.speed) + (this.velocity.x * this.spring);
+    this.velocity.y = ((this.target.y - this.value.y) * this.speed) + (this.velocity.y * this.spring);
+    this.value.x += this.velocity.x;
+    this.value.y += this.velocity.y;
+    if(Raven.distance2D( this.value.x, this.value.y, this.target.x, this.target.y ) < 0.1) {
+      this.velocity.set(0, 0);
+      this.value.set(this.target.x, this.target.y);
+    }
+    return this;
+  }
+  
+  return this;
+};
+
 Raven.Spritesheet = function(src, totalFrames, frameRate, loop) {
   var _this = this;
   
