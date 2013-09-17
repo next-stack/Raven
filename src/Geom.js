@@ -2,8 +2,8 @@ var Raven = Raven || {};
 
 // Vec2
 Raven.Vec2 = function(px, py) {
-  this.x = px;
-  this.y = py;
+  this.x = px ? px : 0;
+  this.y = py ? py : 0;
   
   this.set = function(px, py) {
     this.x = px;
