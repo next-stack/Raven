@@ -426,14 +426,18 @@ function Tween(target, key, to, duration, ease, delay, updateHandler, completeHa
   active = false;
   
   this.obj = target;
-  this.from = target[key];
 	this.to = to;
+  this.from = 0;
 	this.duration = duration * 1000;
 	this.timestamp = new Date().getTime() + (delay ? delay * 1000 : 0);
   this.updateHandler = updateHandler;
   this.completeHandler = completeHandler;
 	
-	this.start = function() { this.from = target[key]; }
+	this.start = function() {
+    this.from = target[key];
+    return this;
+  }
+
 	this.complete = function() {
     target[key] = to;
     if(this.completeHandler) this.completeHandler();
@@ -443,9 +447,13 @@ function Tween(target, key, to, duration, ease, delay, updateHandler, completeHa
 	this.update = function(percent) {
 	  if(!active) {
 	    active = true;
-	    this.from = target[key];
+      this.from = target[key];
+      return this;
 	  }
-	  target[key] = ease.getCurvePercent(percent) * this.range() + this.from;
+
+    var newValue = ease.getCurvePercent(percent) * this.range() + this.from;
+    target[key]  = newValue;
+
     if(this.updateHandler) this.updateHandler();
 	  return this;
 	}
@@ -465,7 +473,62 @@ function Tween(target, key, to, duration, ease, delay, updateHandler, completeHa
 	this.setPenner = function(ease) { ease.setPenner( CubicEase.getPenner(ease) ); return this; }
 	this.setStepped = function() { ease.setStepped(); return this; }
 	
-	return this;
+	return this.start();
+}
+
+function TweenCSS(target, key, to, duration, ease, delay, updateHandler, completeHandler) {
+  var _this = this,
+  active = false;
+  
+  this.obj = target;
+  this.to = to;
+  this.from = 0;
+  this.duration = duration * 1000;
+  this.timestamp = new Date().getTime() + (delay ? delay * 1000 : 0);
+  this.updateHandler = updateHandler;
+  this.completeHandler = completeHandler;
+  
+  this.start = function() {
+    this.from = Number( target['style'][key].split('px')[0] );
+    return this;
+  }
+
+  this.complete = function() {
+    target['style'][key] = to.toString() + 'px';
+    if(this.completeHandler) this.completeHandler();
+    return this;
+  }
+  
+  this.update = function(percent) {
+    if(!active) {
+      active = true;
+      this.from = Number( target['style'][key].split('px')[0] );
+      return this;
+    }
+
+    var newValue = ease.getCurvePercent(percent) * this.range() + this.from;
+    target['style'][key]  = newValue.toString() + 'px';
+
+    if(this.updateHandler) this.updateHandler();
+    return this;
+  }
+  
+  // Getters
+  this.range = function() { return this.to - this.from; }
+  // Tween start time
+  this.startTime = function() { return this.timestamp; }
+  // Tween end time
+  this.endTime = function() { return this.timestamp + this.duration; }
+  // If date is during the tween
+  this.betweenTime = function(ms) { return Raven.between(this.timestamp, this.endTime(), ms); }
+  
+  // Setters
+  this.setLinear = function() { ease.setLinear(); return this; }
+  this.setEase = function(x0, y0, x1, y1) { ease.set(x0, y0, x1, y1); return this; }
+  this.setPenner = function(ease) { ease.setPenner( CubicEase.getPenner(ease) ); return this; }
+  this.setStepped = function() { ease.setStepped(); return this; }
+  
+  return this;
 }
 
 function TweenController() {
@@ -483,6 +546,17 @@ function TweenController() {
   
   this.addPenner = function(target, key, to, duration, penner, delay, updateHandler, completeHandler) {
     tweens.push( new Tween(target, key, to, duration, CubicEase.getPenner(penner), delay, updateHandler, completeHandler) );
+    return this;
+  }
+
+  this.addTweenCSS = function(target, key, to, duration, x0, y0, x1, y1, delay, updateHandler, completeHandler) {
+    var ease = new CubicEase().set(x0, y0, x1, y1);
+    tweens.push( new TweenCSS(target, key, to, duration, ease, delay, updateHandler, completeHandler) );
+    return this;
+  }
+
+  this.addPennerCSS = function(target, key, to, duration, penner, delay, updateHandler, completeHandler) {
+    tweens.push( new TweenCSS(target, key, to, duration, CubicEase.getPenner(penner), delay, updateHandler, completeHandler) );
     return this;
   }
   
