@@ -54,7 +54,7 @@ Function.prototype.extends = function(parent) {
 }());
 
 // Remove before minification
-/*
+
 // Geometry
 Raven.include("src/geom/Raven.Vec.js");
 Raven.include("src/geom/Raven.Rect.js");
@@ -82,4 +82,3 @@ Raven.include("src/view/Raven.View.js");
 Raven.include("src/view/Raven.GL.js");
 Raven.include("src/view/Raven.Canvas.js");
 Raven.include("src/view/Raven.App.js");
-*/

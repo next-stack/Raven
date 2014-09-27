@@ -151,6 +151,7 @@ Raven.View.prototype = {
     drawLine: function(x1, y1, x2, y2) {},
     drawRect: function(x, y, wid, hei, fill, stroke) {},
     drawCircle: function(x, y, radius, fill, stroke) {},
+    drawPoly: function(x, y, radius, sides, fill, stroke) {},
     drawFont: function(msg, x, y) {},
     drawImage: function(img, x, y, width, height, xOffset, yOffset) {},
     getLineWidth: function() { return 0; },
@@ -164,5 +165,12 @@ Raven.View.prototype = {
     setStrokeB: function(brightness) {},
     setStrokeHex: function(hex) {},
     setStrokeRGB: function(r, g, b) {},
-    setStrokeRGBA: function(r, g, b, a) {}
+    setStrokeRGBA: function(r, g, b, a) {},
+    //
+    pushMatrix: function() {},
+    popMatrix: function() {},
+    rotate: function(degrees) {},
+    scale: function(x, y) {},
+    transform: function(a, b, c, d, e, f) {},
+    translate: function(x, y) {}
 };

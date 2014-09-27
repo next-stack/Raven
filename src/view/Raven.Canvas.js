@@ -7,6 +7,17 @@ var Raven = Raven || {};
 Raven.CanvasView = function() {
     Raven.View.call(this);
     this.type = Raven.VIEW_CANVAS;
+    this.matrixRotate    = 0;
+    this.matrixScale     = new Raven.Vec(1, 1);
+    this.matrixTranslate = new Raven.Vec(0, 0);
+    this.matrixTransform = {
+        a: 1,
+        b: 0,
+        c: 0,
+        d: 1,
+        e: 0,
+        f: 0
+    };
     return this;
 };
 
@@ -54,12 +65,12 @@ Raven.CanvasView.prototype.lineTo        = function(x, y) {
     this.context.lineTo(x, y);
     return this;
 };
-Raven.CanvasView.prototype.beginMask     = function() {
+Raven.CanvasView.prototype.beginMask = function() {
     this.context.save();
     this.masking = true;
     return this;
 };
-Raven.CanvasView.prototype.endMask       = function() {
+Raven.CanvasView.prototype.endMask = function() {
     this.masking = false;
     this.context.clip();
     return this;
@@ -92,9 +103,14 @@ Raven.CanvasView.prototype.drawRect      = function(x, y, wid, hei, fill, stroke
 Raven.CanvasView.prototype.drawCircle    = function(x, y, radius, fill, stroke) {
     var hRad = radius * 0.5,
     o = Raven.Align.getOffset(x+hRad, y+hRad, radius, radius, this);
-    this.begin();
-    this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
-    this.end(fill, stroke);
+    if(this.masking) {
+        this.context.beginPath();
+        this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
+    } else {
+        this.begin();
+        this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
+        this.end(fill, stroke);
+    }
     return this;
 };
 Raven.CanvasView.prototype.drawCurve     = function(sx, sy, cx, cy, ex, ey, fill, stroke) {
@@ -115,6 +131,41 @@ Raven.CanvasView.prototype.drawImage     = function(img, x, y, width, height, xO
     } else {
         this.context.drawImage(img, 0, 0, width, height, o.x, o.y, width, height);
     }
+    return this;
+};
+Raven.CanvasView.prototype.drawPoly    = function(x, y, radius, sides, fill, stroke) {
+    if(sides < 2) return this;
+    //
+    var hRad = radius * 0.5,
+    o = Raven.Align.getOffset(x+hRad, y+hRad, radius, radius, this);
+    var i, x0, y0, deg, total = sides+1, iTotal = sides;
+    
+    if(this.masking) {
+        this.context.beginPath();
+        this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
+    } else {
+        this.begin();
+    }
+
+    var degOffset = (360 / sides) * 0.5;
+    for(i = 0; i < total; ++i) {
+        deg = Raven.degToRad( (i / iTotal) * 360 - degOffset );
+        x0 = Math.cos(deg) * radius + o.x;
+        y0 = Math.sin(deg) * radius + o.y;
+        if(i > 0) {
+            this.lineTo(x0, y0);
+        } else {
+            this.moveTo(x0, y0);
+        }
+    }
+    if(!this.masking) this.end(fill, stroke);
+        //
+        // this.begin();
+        // this.moveTo(x1, y1);
+        // this.lineTo(x2, y2);
+        // // this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
+        // this.end(fill, stroke);
+    // }
     return this;
 };
 // Getters
@@ -155,3 +206,61 @@ Raven.CanvasView.prototype.setStrokeRGB  = function(r, g, b) {
 Raven.CanvasView.prototype.setStrokeRGBA = function(r, g, b, a) {
     this.setStroke( new Raven.Color(r, g, b, a) );
 };
+
+Raven.CanvasView.prototype.rotate = function(degrees) {
+    this.matrixRotate = degrees;
+    this.context.rotate( Raven.degToRad(degrees) );
+};
+
+Raven.CanvasView.prototype.scale = function(x, y) {
+    this.matrixScale.set(x, y);
+    this.context.scale( x, y );
+};
+
+Raven.CanvasView.prototype.transform = function(a, b, c, d, e, f) {
+    this.matrixTransform.a = a;
+    this.matrixTransform.b = b;
+    this.matrixTransform.c = c;
+    this.matrixTransform.d = d;
+    this.matrixTransform.e = e;
+    this.matrixTransform.f = f;
+    this.context.transform( a, b, c, d, e, f );
+};
+
+Raven.CanvasView.prototype.translate = function(x, y) {
+    this.matrixTranslate.set(x, y);
+    this.context.translate( x, y );
+};
+
+Raven.CanvasView.prototype.pushMatrix = function() {
+    this.matrixRotate    = 0;
+    this.matrixScale     = new Raven.Vec(1, 1);
+    this.matrixTranslate = new Raven.Vec(0, 0);
+    this.matrixTransform.a = 1;
+    this.matrixTransform.b = 0;
+    this.matrixTransform.c = 0;
+    this.matrixTransform.d = 1;
+    this.matrixTransform.e = 0;
+    this.matrixTransform.f = 0;
+};
+
+Raven.CanvasView.prototype.popMatrix = function() {
+    // Reverse any changes
+    this.rotate( -this.matrixRotate );
+    this.scale(  -this.matrixScale.x,  -this.matrixScale.y );
+    this.transform(
+        -this.matrixTransform.a,
+        -this.matrixTransform.b,
+        -this.matrixTransform.c,
+        -this.matrixTransform.d,
+        -this.matrixTransform.e,
+        -this.matrixTransform.f
+    );
+    this.translate( -this.matrixTranslate.x, -this.matrixTranslate.y );
+
+    // Clear
+    this.pushMatrix();
+};
+
+// pushMatrix: function() {},
+//     popMatrix: function() {},
