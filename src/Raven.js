@@ -1,10 +1,11 @@
 "use strict";
 
 window.Raven = {
+  'base': '../../src/',
   'isMobile': navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/) != null,
   
   'include': function(src) {
-    document.write('<script type="text/javascript" src="../../' + src + '"></script>');
+    document.write('<script type="text/javascript" src="' + this.base + src + '"></script>');
   },
 
   'instance': function(baseClass) {
@@ -53,32 +54,39 @@ Function.prototype.extends = function(parent) {
   };
 }());
 
-// Remove before minification
+/* Remove before minification
 
 // Geometry
-Raven.include("src/geom/Raven.Vec.js");
-Raven.include("src/geom/Raven.Rect.js");
+Raven.include("geom/Raven.Vec.js");
+Raven.include("geom/Raven.Rect.js");
 
 // Utilities
-Raven.include("src/utils/Raven.KeyUtils.js");
-Raven.include("src/utils/Raven.MathUtils.js");
+Raven.include("utils/Raven.KeyUtils.js");
+Raven.include("utils/Raven.MathUtils.js");
 
 // DOM
-Raven.include("src/dom/Raven.DOM.js");
-Raven.include("src/dom/Raven.CSS.js");
+Raven.include("dom/Raven.DOM.js");
+Raven.include("dom/Raven.CSS.js");
 
 // Animation
-Raven.include("src/animation/Raven.Springs.js");
-Raven.include("src/animation/Raven.Spritesheet.js");
-Raven.include("src/animation/Raven.StopWatch.js");
-Raven.include("src/animation/Raven.Tween.js");
+Raven.include("animation/Raven.Springs.js");
+Raven.include("animation/Raven.Spritesheet.js");
+Raven.include("animation/Raven.StopWatch.js");
+Raven.include("animation/Raven.Tween.js");
 
 // Events
-Raven.include("src/events/Raven.Event.js");
-Raven.include("src/events/Raven.EventDispatcher.js");
+Raven.include("events/Raven.Event.js");
+Raven.include("events/Raven.EventDispatcher.js");
+
+// Display
+Raven.include("display/Raven.DisplayObject.js");
+Raven.include("display/Raven.Button.js");
+Raven.include("display/Raven.Scene.js");
+Raven.include("display/Raven.Stage.js");
 
 // View
-Raven.include("src/view/Raven.View.js");
-Raven.include("src/view/Raven.GL.js");
-Raven.include("src/view/Raven.Canvas.js");
-Raven.include("src/view/Raven.App.js");
+Raven.include("view/Raven.View.js");
+Raven.include("view/Raven.GL.js");
+Raven.include("view/Raven.Canvas.js");
+Raven.include("view/Raven.App.js");
+*/
