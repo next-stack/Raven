@@ -116,6 +116,40 @@ Raven.Color.red		= function() { return new Raven.Color(255,   0,   0); };
 Raven.Color.green	= function() { return new Raven.Color(  0, 255,   0); };
 Raven.Color.blue	= function() { return new Raven.Color(  0,   0, 255); };
 
+// View Matrix
+
+Raven.ViewMatrix = function() {
+    this.rotate    = new Raven.Vec(0, 0, 0);
+    this.scale     = new Raven.Vec(1, 1, 1);
+    this.translate = new Raven.Vec(0, 0, 0);
+    this.transform = {
+        a: 1,
+        b: 0,
+        c: 0,
+        d: 1,
+        e: 0,
+        f: 0
+    };
+    return this;
+};
+
+Raven.ViewMatrix.prototype.reset = function() {
+    this.rotate    = new Raven.Vec(0, 0, 0);
+    this.scale     = new Raven.Vec(1, 1, 1);
+    this.translate = new Raven.Vec(0, 0, 0);
+    this.transform = {
+        a: 1,
+        b: 0,
+        c: 0,
+        d: 1,
+        e: 0,
+        f: 0
+    };
+    return this;
+};
+
+// View
+
 Raven.VIEW_CANVAS = "canvas";
 Raven.VIEW_WEBGL  = "webgl";
 
@@ -169,8 +203,8 @@ Raven.View.prototype = {
     //
     pushMatrix: function() {},
     popMatrix: function() {},
-    rotate: function(degrees) {},
-    scale: function(x, y) {},
+    rotate: function(x, y, z) {},
+    scale: function(x, y, z) {},
     transform: function(a, b, c, d, e, f) {},
-    translate: function(x, y) {}
+    translate: function(x, y, z) {}
 };
