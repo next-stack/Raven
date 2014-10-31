@@ -175,6 +175,7 @@ Raven.App.prototype = {
 			case Raven.DOM.RESIZE:
                 if(this.view) this.viewable = Raven.viewable( this.view.element );
 				this.onResize( window.innerWidth, window.innerHeight );
+				Raven.dispatchEvent( new Raven.Event(Raven.Event.RESIZE) );
 			break;
 			case Raven.DOM.KEY_DOWN:
 				this.onKeyDown( Key.getKey(evt.keyCode) );
@@ -184,39 +185,56 @@ Raven.App.prototype = {
 			break;
 			case Raven.DOM.MOUSE_DOWN:
 				this.onTouchDown( 0, evt.x, evt.y );
+				Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.DOWN, evt.x, evt.y) );
 			break;
 			case Raven.DOM.MOUSE_MOVE:
 				this.onTouchMove( 0, evt.x, evt.y );
+				Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.MOVE, evt.x, evt.y) );
 			break;
 			case Raven.DOM.MOUSE_UP:
 				this.onTouchUp( 0, evt.x, evt.y );
+				Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.UP, evt.x, evt.y) );
 			break;
             case Raven.DOM.SCROLL:
                 this.viewable = this.viewable ? Raven.viewable( this.view.element ) : false;
+                var x = 0, y = 0;
                 if(this.viewable) {
-                	this.onScroll( evt, this.view.element.offsetLeft, this.view.element.offsetTop );
+                	x = this.view.element.offsetLeft;
+                	y = this.view.element.offsetTop;
                 } else {
-                	this.onScroll( evt, window.scrollX, window.scrollY );
+                	x = window.scrollX;
+                	y = window.scrollY;
                 }
+                this.onScroll( evt, x, y );
+                Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.SCROLLED, x, y) );
             break;
             case Raven.DOM.TOUCH_DOWN:
-            	var i, touches = evt.targetTouches, total = touches.length;
+            	var i, x, y, touches = evt.targetTouches, total = touches.length;
 				for(i = 0; i < total; ++i) {
-					this.onTouchDown( touches[i].identifier, touches[i].clientX, touches[i].clientY );
+					x = touches[i].clientX;
+					y = touches[i].clientY;
+					this.onTouchDown( touches[i].identifier, x, y );
+					Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.DOWN, x, y, touches[i].identifier) );
 				}
 				touches = null;
             break;
             case Raven.DOM.TOUCH_MOVE:
-            	var i, touches = evt.targetTouches, total = touches.length;
+            	var i, x, y, touches = evt.targetTouches, total = touches.length;
 				for(i = 0; i < total; ++i) {
+					x = touches[i].clientX;
+					y = touches[i].clientY;
 					this.onTouchMove( touches[i].identifier, touches[i].clientX, touches[i].clientY );
+					Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.MOVE, x, y, touches[i].identifier) );
 				}
 				touches = null;
             break;
             case Raven.DOM.TOUCH_UP:
-            	var i, touches = evt.targetTouches, total = touches.length;
+            	var i, x, y, touches = evt.targetTouches, total = touches.length;
 				for(i = 0; i < total; ++i) {
+					x = touches[i].clientX;
+					y = touches[i].clientY;
 					this.onTouchUp( touches[i].identifier, touches[i].clientX, touches[i].clientY );
+					Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.UP, x, y, touches[i].identifier) );
 				}
 				touches = null;
             break;
