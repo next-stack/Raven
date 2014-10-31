@@ -28,7 +28,7 @@ function AppController(params) {
         // Draw mask
         g.pushMatrix();
         g.translate(x, y);
-        g.rotate(rotate);
+        g.rotate(0, 0, rotate);
         g.drawPoly(-halfR, -halfR, radius, 6);
         g.popMatrix();
 
@@ -58,7 +58,7 @@ function AppController(params) {
         g.setStrokeRGB(255, 0, 0);
         g.pushMatrix();
         g.translate(x, y);
-        g.rotate(rotate);
+        g.rotate(0, 0, rotate);
         g.drawPoly(-halfR, -halfR, radius, 6, false, true);
         g.popMatrix();
 
