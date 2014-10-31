@@ -7,22 +7,21 @@ var Raven = Raven || {};
 Raven.CanvasView = function() {
     Raven.View.call(this);
     this.type = Raven.VIEW_CANVAS;
-    this.matrixRotate    = 0;
-    this.matrixScale     = new Raven.Vec(1, 1);
-    this.matrixTranslate = new Raven.Vec(0, 0);
-    this.matrixTransform = {
-        a: 1,
-        b: 0,
-        c: 0,
-        d: 1,
-        e: 0,
-        f: 0
-    };
+    this.matrices = [
+        new Raven.ViewMatrix()
+    ];
     return this;
 };
 
 Raven.CanvasView.prototype = new Raven.View();
 Raven.CanvasView.prototype.constructor = Raven.CanvasView;
+
+Raven.CanvasView.prototype.__defineGetter__("matrix", function(){
+    if(this.matrices.length > 0) {
+        return this.matrices[ this.matrices.length-1 ];
+    }
+    return null;
+});
 
 Raven.CanvasView.prototype.setup         = function(cElement) {
     this.align      = Raven.Align.TOP_LEFT;
@@ -207,60 +206,53 @@ Raven.CanvasView.prototype.setStrokeRGBA = function(r, g, b, a) {
     this.setStroke( new Raven.Color(r, g, b, a) );
 };
 
-Raven.CanvasView.prototype.rotate = function(degrees) {
-    this.matrixRotate = degrees;
-    this.context.rotate( Raven.degToRad(degrees) );
+Raven.CanvasView.prototype.rotate = function(x, y, z) {
+    if(x !== undefined) this.matrix.rotate.x = x;
+    if(y !== undefined) this.matrix.rotate.y = y;
+    if(z !== undefined) this.matrix.rotate.z = z;
+    this.context.rotate( Raven.degToRad(this.matrix.rotate.z) );
 };
 
-Raven.CanvasView.prototype.scale = function(x, y) {
-    this.matrixScale.set(x, y);
+Raven.CanvasView.prototype.scale = function(x, y, z) {
+    if(x !== undefined) this.matrix.scale.x = x;
+    if(y !== undefined) this.matrix.scale.y = y;
+    if(z !== undefined) this.matrix.scale.z = z;
     this.context.scale( x, y );
 };
 
 Raven.CanvasView.prototype.transform = function(a, b, c, d, e, f) {
-    this.matrixTransform.a = a;
-    this.matrixTransform.b = b;
-    this.matrixTransform.c = c;
-    this.matrixTransform.d = d;
-    this.matrixTransform.e = e;
-    this.matrixTransform.f = f;
+    this.matrix.transform.a = a;
+    this.matrix.transform.b = b;
+    this.matrix.transform.c = c;
+    this.matrix.transform.d = d;
+    this.matrix.transform.e = e;
+    this.matrix.transform.f = f;
     this.context.transform( a, b, c, d, e, f );
 };
 
-Raven.CanvasView.prototype.translate = function(x, y) {
-    this.matrixTranslate.set(x, y);
+Raven.CanvasView.prototype.translate = function(x, y, z) {
+    if(x !== undefined) this.matrix.translate.x = x;
+    if(y !== undefined) this.matrix.translate.y = y;
+    if(z !== undefined) this.matrix.translate.z = z;
     this.context.translate( x, y );
 };
 
 Raven.CanvasView.prototype.pushMatrix = function() {
-    this.matrixRotate    = 0;
-    this.matrixScale     = new Raven.Vec(1, 1);
-    this.matrixTranslate = new Raven.Vec(0, 0);
-    this.matrixTransform.a = 1;
-    this.matrixTransform.b = 0;
-    this.matrixTransform.c = 0;
-    this.matrixTransform.d = 1;
-    this.matrixTransform.e = 0;
-    this.matrixTransform.f = 0;
+    this.matrices.push( new Raven.ViewMatrix() );
 };
 
 Raven.CanvasView.prototype.popMatrix = function() {
     // Reverse any changes
-    this.rotate( -this.matrixRotate );
-    this.scale(  -this.matrixScale.x,  -this.matrixScale.y );
+    this.rotate( -this.matrix.rotate.x, -this.matrix.rotate.y, -this.matrix.rotate.z );
+    this.scale(  -this.matrix.scale.x,  -this.matrix.scale.y,  -this.matrix.scale.z );
     this.transform(
-        -this.matrixTransform.a,
-        -this.matrixTransform.b,
-        -this.matrixTransform.c,
-        -this.matrixTransform.d,
-        -this.matrixTransform.e,
-        -this.matrixTransform.f
+        -this.matrix.transform.a,
+        -this.matrix.transform.b,
+        -this.matrix.transform.c,
+        -this.matrix.transform.d,
+        -this.matrix.transform.e,
+        -this.matrix.transform.f
     );
-    this.translate( -this.matrixTranslate.x, -this.matrixTranslate.y );
-
-    // Clear
-    this.pushMatrix();
+    this.translate( -this.matrix.translate.x, -this.matrix.translate.y, -this.matrix.translate.z );
+    this.matrices.pop();
 };
-
-// pushMatrix: function() {},
-//     popMatrix: function() {},
