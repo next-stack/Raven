@@ -7,13 +7,17 @@ uglifyjs src/Raven.js \
 		src/events/Raven.EventDispatcher.js \
 		src/dom/Raven.DOM.js \
 		src/dom/Raven.CSS.js \
-		src/view/Raven.View.js \
-		src/view/Raven.Canvas.js \
-		src/view/Raven.GL.js \
 		src/animation/Raven.Springs.js \
 		src/animation/Raven.Spritesheet.js \
 		src/animation/Raven.StopWatch.js \
 		src/animation/Raven.Tween.js \
+		src/display/Raven.DisplayObject.js \
+		src/display/Raven.Button.js \
+		src/display/Raven.Scene.js \
+		src/display/Raven.Stage.js \
+		src/view/Raven.View.js \
+		src/view/Raven.Canvas.js \
+		src/view/Raven.GL.js \
 		src/view/Raven.App.js \
 		-o bin/raven.min.js \
 		-c \
