@@ -38,6 +38,7 @@ Raven.App = function(params) {
 	this.autoRender = function() {
 		if(_this.playing) window.requestAnimationFrame(_this.autoRender);
 		if(Raven.Ani !== undefined) Raven.Ani.update();
+		if(Raven.Springy !== undefined) Raven.Springy.update();
 		_this.updateHandler();
 	};
 

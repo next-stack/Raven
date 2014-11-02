@@ -48,9 +48,18 @@ Raven.Spring.prototype.update = function() {
 
     // Callbacks
     if(this.onUpdate !== undefined) this.onUpdate(this.value);
-    if(this.onComplete !== undefined) {
-        if(this.isComplete()) this.onComplete(this.value);
+    return this;
+};
+
+Raven.Spring.prototype.onCompletion = function() {
+    this.value = this.target;
+    this.acc = 0;
+    this.vel = 0;
+    // Update object
+    if(this.obj !== undefined && this.pointer !== undefined) {
+        this.obj[this.pointer] = this.value;
     }
+    if(this.onComplete !== undefined) this.onComplete(this.value);
     return this;
 };
 
@@ -58,12 +67,16 @@ Raven.Spring.prototype.update = function() {
 
 Raven.Spring.prototype.isComplete = function() {
     var vel = Math.abs(this.acc) + Math.abs(this.vel);
-    return vel < Raven.Spring.INTERPOLATION_PRECISION;
+    var isClose = vel < Raven.Spring.INTERPOLATION_PRECISION;
+    if(isClose) {
+        return Raven.distance(this.value, this.target) < Raven.Spring.INTERPOLATION_PRECISION;
+    }
+    return false;
 };
 
 // Static
 Raven.Spring.historyLength = 10;
-Raven.Spring.INTERPOLATION_PRECISION = 0.01;
+Raven.Spring.INTERPOLATION_PRECISION = 0.002;
 
 /*************************************************
  * SpringVec
@@ -116,9 +129,6 @@ Raven.SpringVec.prototype.update = function() {
 
     // Callbacks
     if(this.onUpdate !== undefined) this.onUpdate(this.value);
-    if(this.onComplete !== undefined) {
-        if(this.isComplete()) this.onComplete(this.value);
-    }
     return this;
 };
 
@@ -137,10 +147,29 @@ Raven.SpringVec.prototype.draw = function(g) {
     }
 };
 
+Raven.SpringVec.prototype.onCompletion = function() {
+    this.value = this.target;
+    this.acc.set(0, 0, 0);
+    this.vel.set(0, 0, 0);
+    // Update object
+    if(this.obj !== undefined && this.pointer !== undefined) {
+        var obj = this.obj[this.pointer];
+        obj.x = this.value.x;
+        obj.y = this.value.y;
+        obj.z = this.value.z;
+    }
+    if(this.onComplete !== undefined) this.onComplete(this.value);
+    return this;
+};
+
 // Getters
 
 Raven.SpringVec.prototype.isComplete = function() {
     var vel = Math.abs(this.acc.length()) + Math.abs(this.vel.length());
+    var isClose = vel < Raven.Spring.INTERPOLATION_PRECISION;
+    if(isClose) {
+        return this.value.distance(this.target) < Raven.Spring.INTERPOLATION_PRECISION;
+    }
     return vel < Raven.Spring.INTERPOLATION_PRECISION;
 };
 
@@ -174,6 +203,7 @@ Raven.SpringController.prototype.update = function() {
         sp.update();
         // Remove dead springs
         if(sp.isComplete()) {
+            sp.onCompletion();
             this.springs.splice(i, 1);
             --i;
         }
@@ -185,6 +215,7 @@ Raven.SpringController.prototype.update = function() {
         sp.update();
         // Remove dead springs
         if(sp.isComplete()) {
+            sp.onCompletion();
             this.springVecs.splice(i, 1);
             --i;
         }
@@ -196,6 +227,8 @@ Raven.SpringController.prototype.draw = function(g) {
     for(var i in this.springVecs) {
         this.springVecs[i].draw(g);
     }
+    g.setFillRGB(255, 255, 255);
+    g.drawFont("Total springs: " + (this.springs.length + this.springVecs.length).toString(), 25, 50);
 };
 
 Raven.SpringController.prototype.to = function(vObj, vTarget, target, update, complete, spring, mass, friction) {
@@ -246,10 +279,10 @@ Raven.SpringController.prototype.override = function(spring, mass, friction) {
 //////////////////////////////////////////////////
 // Getters
 
-Raven.SpringController.prototype.hasSpring = function(spring) {
+Raven.SpringController.prototype.hasSpring = function(fObj) {
     for(var i in this.springs) {
         var sp = this.springs[i];
-        if(sp.obj == fObj && sp.pointer == fTarget) {
+        if(sp.obj == fObj) {
             return sp;
         }
     }
