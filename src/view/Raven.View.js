@@ -184,6 +184,7 @@ Raven.View.prototype = {
     stopMask: function() {},
     drawLine: function(x1, y1, x2, y2) {},
     drawRect: function(x, y, wid, hei, fill, stroke) {},
+    drawArc: function(x, y, radius, degrees, angleOffset, fill, stroke) {},
     drawCircle: function(x, y, radius, fill, stroke) {},
     drawPoly: function(x, y, radius, sides, fill, stroke) {},
     drawFont: function(msg, x, y) {},

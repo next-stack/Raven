@@ -99,6 +99,24 @@ Raven.CanvasView.prototype.drawRect      = function(x, y, wid, hei, fill, stroke
     }
     return this;
 };
+Raven.CanvasView.prototype.drawArc       = function(x, y, radius, degrees, angleOffset, fill, stroke) {
+    if(degrees - angleOffset >= 360) {
+        return this.drawCircle(x, y, radius, fill, stroke);
+    }
+    var hRad = radius * 0.5,
+    o = Raven.Align.getOffset(x+hRad, y+hRad, radius, radius, this);
+    var rArc = Raven.degToRad(degrees),
+        rOff = Raven.degToRad(angleOffset);
+    if(this.masking) {
+        this.context.beginPath();
+        this.context.arc(o.x, o.y, hRad, rOff, rArc, false);
+    } else {
+        this.begin();
+        this.context.arc(o.x, o.y, hRad, rOff, rArc, false);
+        this.end(fill, stroke);
+    }
+    return this;
+};
 Raven.CanvasView.prototype.drawCircle    = function(x, y, radius, fill, stroke) {
     var hRad = radius * 0.5,
     o = Raven.Align.getOffset(x+hRad, y+hRad, radius, radius, this);
@@ -158,13 +176,6 @@ Raven.CanvasView.prototype.drawPoly    = function(x, y, radius, sides, fill, str
         }
     }
     if(!this.masking) this.end(fill, stroke);
-        //
-        // this.begin();
-        // this.moveTo(x1, y1);
-        // this.lineTo(x2, y2);
-        // // this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
-        // this.end(fill, stroke);
-    // }
     return this;
 };
 // Getters
