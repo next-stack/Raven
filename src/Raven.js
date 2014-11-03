@@ -1,11 +1,11 @@
 "use strict";
 
 window.Raven = {
-  'base': '../../src/',
   'isMobile': navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/) != null,
   
   'include': function(src) {
-    document.write('<script type="text/javascript" src="' + this.base + src + '"></script>');
+    var base = "../../src/";
+    document.write('<script type="text/javascript" src="' + base + src + '"></script>');
   },
 
   'instance': function(baseClass) {
@@ -16,6 +16,16 @@ window.Raven = {
 
   'element': function(domID) {
     return document.getElementById(domID);
+  },
+
+  /**
+   * To accuractely retrieve the elapsed frames in an app.
+   * @param  {int} startMS Application's start time, in milliseconds.
+   * @return {int}         The elapsed frames
+   */
+  'getFrame': function(startMS) {
+    var appFPS = 60;
+    return Math.round( (Date.now() - startMS) / appFPS );
   }
 };
 
