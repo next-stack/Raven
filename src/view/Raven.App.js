@@ -17,6 +17,10 @@ Raven.App = function(params) {
 	this.fullscreen		= false;
 	// in case you need to pause the auto-runner
 	this.playing		= true;
+	// start time, in millseconds
+	this.startTime		= 0;
+	// elapsed time, in millseconds
+	this.elapsedTime    = 0;
 	// for event handling
 	this.supportMobile	= false;
 	// View instance
@@ -52,11 +56,13 @@ Raven.App = function(params) {
                 if(_this.view.autoClear) _this.view.clear();
                 _this.draw();
             }
-            ++_this.frameNum;
+            _this.frameNum = Raven.getFrame(_this.startTime);
+            _this.elapsedTime = Date.now() - _this.startTime;
         } else if(_this.view === null) {
             _this.update();
             _this.draw();
-            ++_this.frameNum;
+            _this.frameNum = Raven.getFrame(_this.startTime);
+            _this.elapsedTime = Date.now() - _this.startTime;
         }
 	};
 
@@ -66,6 +72,9 @@ Raven.App = function(params) {
 	this.domHandler = function(evt) {
 		_this.evtHandler(evt);
 	};
+
+	this.startTime = Date.now();
+	return this;
 };
 
 Raven.App.prototype = {
@@ -154,10 +163,13 @@ Raven.App.prototype = {
 		var _align = this.view.align;
 		this.view.align = Raven.Align.TOP_LEFT;
 		this.view.setFillB(0);
-        this.view.drawRect(20, 10, 120, 25, true);
+        this.view.drawRect(20, 10, 140, 25, true);
 		this.view.setFillB(255);
-		this.view.drawFont("Frame #" + this.frameNum.toString(), 25, 25);
-		this.view.drawFont("Frame #" + this.frameNum.toString(), 25, this.view.height-25);
+		var appTime = this.elapsedTime / 1000;
+		var output = "Frame #" + this.frameNum.toString();
+		output += ", Time " + appTime.toFixed(1);
+		this.view.drawFont(output, 25, 25);
+		this.view.drawFont(output, 25, this.view.height-25);
 		this.view.align = _align;
 	},
 	// Handled
