@@ -73,6 +73,7 @@ Raven.include("geom/Raven.Rect.js");
 // Utilities
 Raven.include("utils/Raven.KeyUtils.js");
 Raven.include("utils/Raven.MathUtils.js");
+Raven.include("utils/Raven.TimeUtils.js");
 
 // DOM
 Raven.include("dom/Raven.DOM.js");
