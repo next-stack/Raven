@@ -15,11 +15,12 @@ function AppController(params) {
         Raven.App.prototype.draw.call(this);
 
         // Declare vars
-        var radius = Raven.cosRange(this.frameNum, 200, 100);
+        var time = this.elapsedTime * 0.075;
+        var radius = Raven.cosRange(time, 200, 100);
         var halfR  = radius * 0.5;
-        var rotate = this.frameNum * 1.5,
-        x = Raven.cosRange(this.frameNum*3, 450, 50),
-        y = Raven.cosRange(this.frameNum*1, 200, 200);
+        var rotate = time * 1.5,
+        x = Raven.cosRange(time*(Math.PI * 0.5), 450, 50),
+        y = Raven.cosRange(time*1, 200, 200);
         g.context.font = "48px Helvetica";
 
         // Begin Masking

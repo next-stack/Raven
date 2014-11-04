@@ -3,6 +3,7 @@ uglifyjs src/Raven.js \
 		src/geom/Raven.Rect.js \
 		src/utils/Raven.KeyUtils.js \
 		src/utils/Raven.MathUtils.js \
+		src/utils/Raven.TimeUtils.js \
 		src/events/Raven.Event.js \
 		src/events/Raven.EventDispatcher.js \
 		src/dom/Raven.DOM.js \

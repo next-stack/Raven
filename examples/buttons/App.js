@@ -13,24 +13,15 @@ function AppController(params) {
         //
         var btn;
 
-        // About
         btn = new Raven.Button();
-        btn.name = "About";
+        btn.name = "Hello";
         btn.setup(25, 100, 100, 30);
         stage.addChild(btn);
         btn.addListener(Raven.Button.CLICK, btnHandler);
 
-        // Play
         btn = new Raven.Button();
-        btn.name = "Play";
+        btn.name = "World";
         btn.setup(135, 100, 100, 30);
-        stage.addChild(btn);
-        btn.addListener(Raven.Button.CLICK, btnHandler);
-
-        // Work
-        btn = new Raven.Button();
-        btn.name = "Work";
-        btn.setup(245, 100, 100, 30);
         stage.addChild(btn);
         btn.addListener(Raven.Button.CLICK, btnHandler);
         //
@@ -49,7 +40,7 @@ function AppController(params) {
     };
 
     function btnHandler(evt) {
-        console.log(evt.type, evt);
+        console.log(evt.type, evt.params.name);
     }
 
     return this;

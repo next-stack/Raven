@@ -10,17 +10,12 @@ var Raven = Raven || {};
 
 Raven.App = function(params) {
 	var _this = this;
-
-	// keeps the frame index
-	this.frameNum		= 0;
 	// fullscreens the canvas element
 	this.fullscreen		= false;
 	// in case you need to pause the auto-runner
 	this.playing		= true;
 	// start time, in millseconds
-	this.startTime		= 0;
-	// elapsed time, in millseconds
-	this.elapsedTime    = 0;
+	this.timer          = new Raven.Timer();
 	// for event handling
 	this.supportMobile	= false;
 	// View instance
@@ -41,9 +36,11 @@ Raven.App = function(params) {
 	 */
 	this.autoRender = function() {
 		if(_this.playing) window.requestAnimationFrame(_this.autoRender);
-		if(Raven.Ani !== undefined) Raven.Ani.update();
-		if(Raven.Springy !== undefined) Raven.Springy.update();
-		_this.updateHandler();
+		if(_this.timer.running) {
+			if(Raven.Ani !== undefined) Raven.Ani.update();
+			if(Raven.Springy !== undefined) Raven.Springy.update();
+			_this.updateHandler();
+		}
 	};
 
 	/**
@@ -56,13 +53,11 @@ Raven.App = function(params) {
                 if(_this.view.autoClear) _this.view.clear();
                 _this.draw();
             }
-            _this.frameNum = Raven.getFrame(_this.startTime);
-            _this.elapsedTime = Date.now() - _this.startTime;
+            _this.timer.update();
         } else if(_this.view === null) {
             _this.update();
             _this.draw();
-            _this.frameNum = Raven.getFrame(_this.startTime);
-            _this.elapsedTime = Date.now() - _this.startTime;
+            _this.timer.update();
         }
 	};
 
@@ -73,7 +68,7 @@ Raven.App = function(params) {
 		_this.evtHandler(evt);
 	};
 
-	this.startTime = Date.now();
+	this.timer.restart();
 	return this;
 };
 
@@ -88,10 +83,10 @@ Raven.App.prototype = {
 		return false;
 	},
     pause: function() {
-        this.playing = false;
+        this.timer.pause();
     },
     play: function() {
-        this.playing = true;
+        this.timer.play();
         this.autoRender();
     },
 	enable:  function() {
@@ -165,9 +160,8 @@ Raven.App.prototype = {
 		this.view.setFillB(0);
         this.view.drawRect(20, 10, 140, 25, true);
 		this.view.setFillB(255);
-		var appTime = this.elapsedTime / 1000;
-		var output = "Frame #" + this.frameNum.toString();
-		output += ", Time " + appTime.toFixed(1);
+		var output = "Time " + this.timer.seconds.toFixed(2);
+		output += " Frame #" + this.timer.frameNum.toString();
 		this.view.drawFont(output, 25, 25);
 		this.view.drawFont(output, 25, this.view.height-25);
 		this.view.align = _align;
@@ -254,3 +248,11 @@ Raven.App.prototype = {
 		}
 	}
 };
+
+Raven.App.prototype.__defineGetter__("frameNum", function(){
+    return this.timer.frameNum;
+});
+
+Raven.App.prototype.__defineGetter__("elapsedTime", function(){
+    return this.timer.elapsedMS;
+});
