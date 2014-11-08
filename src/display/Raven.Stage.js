@@ -2,6 +2,7 @@ var Raven = Raven || {};
 
 Raven.Stage = function(params) {
 	Raven.DisplayObject.apply(this, arguments);
+	this.constructor.name = "Raven.Stage";
 	this.name			= "Raven.Stage";
 	this.sceneIndex		= -1;
 	this.activeScene	= null;

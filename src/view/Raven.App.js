@@ -9,6 +9,7 @@ var Raven = Raven || {};
  */
 
 Raven.App = function(params) {
+	this.constructor.name = "Raven.App";
 	var _this = this;
 	// fullscreens the canvas element
 	this.fullscreen		= false;

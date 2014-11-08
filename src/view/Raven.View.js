@@ -50,6 +50,7 @@ Raven.Align = {
 };
 
 Raven.Color = function(r, g, b, a) {
+    this.constructor.name = "Raven.Color";
      this.r = r ? r : 0;
      this.g = g ? g : 0;
      this.b = b ? b : 0;
@@ -119,6 +120,7 @@ Raven.Color.blue	= function() { return new Raven.Color(  0,   0, 255); };
 // View Matrix
 
 Raven.ViewMatrix = function() {
+    this.constructor.name = "Raven.ViewMatrix";
     this.rotate    = new Raven.Vec(0, 0, 0);
     this.scale     = new Raven.Vec(1, 1, 1);
     this.translate = new Raven.Vec(0, 0, 0);
@@ -154,6 +156,7 @@ Raven.VIEW_CANVAS = "canvas";
 Raven.VIEW_WEBGL  = "webgl";
 
 Raven.View = function() {
+    this.constructor.name = "Raven.View";
     var _this = this;
     this.align      = Raven.Align.TOP_LEFT;
     this.autoClear	= true;

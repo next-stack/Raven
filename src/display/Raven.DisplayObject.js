@@ -2,6 +2,7 @@ var Raven = Raven || {};
 
 Raven.DisplayObject = function(params) {
     Raven.EventDispatcher.apply(this, arguments);
+    this.constructor.name = "Raven.DisplayObject";
 	this.name			= "Raven.DisplayObject_" + Raven.DisplayObject.count.toString();
 	this.alpha			= 1.0;
 	this.visible		= true;
@@ -137,6 +138,19 @@ Raven.DisplayObject.prototype.drawChildren = function(view) {
 Raven.DisplayObject.prototype.render = function(view) {
 	// Your code here
 	return this;
+};
+
+/**
+ * For collisions
+ * @param  {[type]} x [description]
+ * @param  {[type]} y [description]
+ * @return {[type]}   [description]
+ */
+Raven.DisplayObject.prototype.hitTest = function(x, y) {
+    return Raven.inBounds(x, y, this.absoluteLeft,
+                                this.absoluteTop,
+                                this.absoluteRight,
+                                this.absoluteBottom);
 };
 
 //////////////////////////////////////////////////

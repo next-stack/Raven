@@ -1,6 +1,7 @@
 var Raven = Raven || {};
 
 Raven.Vec = function(px, py, pz) {
+    this.constructor.name = "Raven.Vec";
     this.x = px !== undefined ? px : 0;
     this.y = py !== undefined ? py : 0;
     this.z = pz !== undefined ? pz : 0;

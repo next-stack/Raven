@@ -3,6 +3,9 @@ var Raven = Raven || {};
 Raven.Button = function(params) {
     Raven.DisplayObject.apply(this, arguments);
 
+    this.constructor.name = "Raven.Button";
+    this.name           = "Raven.Button_" + Raven.Button.count.toString();
+
     // Booleans
     this.isEnabled      = false;
     this.isDown         = false;
@@ -11,8 +14,10 @@ Raven.Button = function(params) {
     // Vectors
     this.touchOffset    = new Raven.Vec(0, 0);
 
-    // Public
-    
+    // Makes it extendable
+    var _this = this;
+    function evtHandler(evt) { _this.handleEvent(evt); }
+
     this.enable = function() {
         if( this.isEnabled ) return this;
         this.isEnabled = true;
@@ -31,39 +36,9 @@ Raven.Button = function(params) {
         return this;
     };
 
-    // Private
-    
-    var _this = this;
-    
-    function evtHandler(evt) {
-        var inBounds = _this.hitTest(evt.x, evt.y);
-        var  wasOver = _this.isOver;
-        _this.isOver = inBounds;
-        
-        switch(evt.type) {
-            case Raven.ActionEvent.DOWN:
-                if(inBounds) {
-                    _this.isDown = true;
-                    _this.onPress();
-                    _this.dispatchEvent(new Raven.Event(Raven.Button.CLICK, _this));
-                }
-            break;
-            case Raven.ActionEvent.MOVE:
-                if(inBounds) {
-                    if(!wasOver) _this.onRollOver();
-                    _this.onMove();
-                } else {
-                    if(wasOver) _this.onRollOut();
-                }
-            break;
-            case Raven.ActionEvent.UP:
-                _this.isDown = false;
-                inBounds ? _this.onReleased() : _this.onReleasedOutside();
-            break;
-        }
-    }
-
     this.enable(); // auto-enable
+
+    ++Raven.Button.count;
 
     return this;
 };
@@ -75,6 +50,34 @@ Raven.Button.count = 0;
 
 Raven.Button.CLICK          = "ravenClick";
 
+Raven.Button.prototype.handleEvent = function(evt) {
+    var  wasOver = this.isOver;
+    this.isOver  = this.hitTest(evt.x, evt.y);
+    
+    switch(evt.type) {
+        case Raven.ActionEvent.DOWN:
+            if(this.isOver) {
+                this.isDown = true;
+                this.onPress();
+                this.dispatchEvent(new Raven.Event(Raven.Button.CLICK, this));
+            }
+        break;
+        case Raven.ActionEvent.MOVE:
+            if(this.isOver) {
+                if(!wasOver) this.onRollOver();
+                this.onMove();
+            } else {
+                if(wasOver) this.onRollOut();
+            }
+        break;
+        case Raven.ActionEvent.UP:
+            this.isDown = false;
+            this.isOver ? this.onReleased() : this.onReleasedOutside();
+        break;
+    }
+    return this;
+};
+
 Raven.Button.prototype.render = function(view) {
     var a = this.isEnabled ? 255 : 102;
     if(this.isDown)         view.setFillRGBA(255, 0, 0, a);
@@ -84,13 +87,6 @@ Raven.Button.prototype.render = function(view) {
     view.setFillB(255);
     view.drawFont(this.name, 10, 18);
     return this;
-};
-
-Raven.Button.prototype.hitTest = function(x, y) {
-    return Raven.inBounds(x, y, this.absoluteLeft,
-                                this.absoluteTop,
-                                this.absoluteRight,
-                                this.absoluteBottom);
 };
 
 // Handlers

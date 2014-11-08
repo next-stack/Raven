@@ -1,6 +1,7 @@
 var Raven = Raven || {};
 
 Raven.Timer = function(params) {
+    this.constructor.name = "Raven.Timer";
     this.startMS        = 0;
     this.elapsedMS      = 0;
     this.running        = true;

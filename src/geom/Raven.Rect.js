@@ -1,6 +1,7 @@
 var Raven = Raven || {};
 
 Raven.Rect = function(x, y, w, h) {
+    this.constructor.name = "Raven.Rect";
     this.x = x ? x : 0;
     this.y = y ? y : 0;
     this.width  = w ? w : 0;

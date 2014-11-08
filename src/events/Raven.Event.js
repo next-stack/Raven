@@ -6,6 +6,7 @@ var Raven = Raven || {};
  * @param {object} params Event object parameters
  */
 Raven.Event = function(type, params) {
+	this.constructor.name = "Raven.Event";
     this.type = type;
     this.params = params;
     return this;
@@ -28,6 +29,7 @@ Raven.Event.RESIZE      = "ravenResize";
  * @param {float} pressure Touch pressure
  */
 Raven.ActionEvent = function(type, x, y, index, pressure) {
+	this.constructor.name = "Raven.ActionEvent";
     this.type = type;
     this.x = x;
     this.y = y;
