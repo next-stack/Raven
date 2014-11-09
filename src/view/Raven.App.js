@@ -9,7 +9,6 @@ var Raven = Raven || {};
  */
 
 Raven.App = function(params) {
-	this.constructor.name = "Raven.App";
 	var _this = this;
 	// fullscreens the canvas element
 	this.fullscreen		= false;
@@ -17,6 +16,8 @@ Raven.App = function(params) {
 	this.playing		= true;
 	// start time, in millseconds
 	this.timer          = new Raven.Timer();
+	// Display stage
+	this.stage			= new Raven.Stage();
 	// for event handling
 	this.supportMobile	= false;
 	// View instance
@@ -49,6 +50,7 @@ Raven.App = function(params) {
 	 */
 	this.updateHandler = function() {
 		if(_this.view && _this.viewable) {
+			_this.stage.update();
             _this.update();
             if(_this.checkViewable()) {
                 if(_this.view.autoClear) _this.view.clear();
@@ -56,6 +58,7 @@ Raven.App = function(params) {
             }
             _this.timer.update();
         } else if(_this.view === null) {
+        	_this.stage.update();
             _this.update();
             _this.draw();
             _this.timer.update();
@@ -131,7 +134,7 @@ Raven.App.prototype = {
         Raven.unwatch(element, Raven.DOM.MOUSE_UP,   this.domHandler);
     },
 	setup:   function(viewElement, width, height, renderer) {
-		if(viewElement && renderer !== undefined) {
+		if(viewElement !== undefined && renderer !== undefined) {
 			// Setup the view
             if(renderer == Raven.VIEW_WEBGL) {
                 // Raven.GLView temporarily disabled
@@ -156,6 +159,8 @@ Raven.App.prototype = {
 	update:  function() {},
 	draw:    function() {
 		if(!this.viewable) return;
+		this.stage.draw(this.view);
+
 		var _align = this.view.align;
 		this.view.align = Raven.Align.TOP_LEFT;
 		this.view.setFillB(0);
@@ -249,6 +254,8 @@ Raven.App.prototype = {
 		}
 	}
 };
+
+Raven.App.prototype.constructor = Raven.App;
 
 Raven.App.prototype.__defineGetter__("frameNum", function(){
     return this.timer.frameNum;
