@@ -2,7 +2,6 @@ var Raven = Raven || {};
 
 Raven.DisplayObject = function(params) {
     Raven.EventDispatcher.apply(this, arguments);
-    this.constructor.name = "Raven.DisplayObject";
 	this.name			= "Raven.DisplayObject_" + Raven.DisplayObject.count.toString();
 	this.alpha			= 1.0;
 	this.visible		= true;
@@ -16,7 +15,7 @@ Raven.DisplayObject = function(params) {
 	return this;
 };
 
-Raven.DisplayObject.extends( Raven.EventDispatcher );
+Raven.DisplayObject.extends( Raven.EventDispatcher, Raven.DisplayObject );
 Raven.DisplayObject.count = 0;
 
 /**
@@ -54,6 +53,7 @@ Raven.DisplayObject.prototype.dispose = function() {
  * @return {Raven.DisplayObject} this
  */
 Raven.DisplayObject.prototype.update = function() {
+	if(!this.visible) return this;
 	this.updateChildren();
 	return this;
 };
@@ -66,15 +66,17 @@ Raven.DisplayObject.prototype.update = function() {
 Raven.DisplayObject.prototype.updateChildren = function() {
 	var i, total = this.numChildren;
 	for(i = 0; i < total; ++i) {
-		this.children[i].update();
-		if(this.children[i].right  > this.size.x) {
-			this.size.x = this.children[i].right;
-		}
-		if(this.children[i].bottom > this.size.y) {
-			this.size.y = this.children[i].bottom;
-		}
-		if(this.children[i].back   > this.size.z) {
-			this.size.z = this.children[i].back;
+		if(this.children[i].visible) {
+			this.children[i].update();
+			if(this.children[i].right  > this.size.x) {
+				this.size.x = this.children[i].right;
+			}
+			if(this.children[i].bottom > this.size.y) {
+				this.size.y = this.children[i].bottom;
+			}
+			if(this.children[i].back   > this.size.z) {
+				this.size.z = this.children[i].back;
+			}
 		}
 	}
 	return this;
@@ -86,6 +88,8 @@ Raven.DisplayObject.prototype.updateChildren = function() {
  * @return {Raven.DisplayObject} this
  */
 Raven.DisplayObject.prototype.draw = function(view) {
+	if(!this.visible) return this;
+
 	this.pushMatrix(view);
 	this.render(view);
 	this.drawChildren(view);
