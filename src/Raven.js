@@ -31,8 +31,15 @@ window.Raven = {
 
 // Function helpers
 
-Function.prototype.extends = function(parent) {
+/**
+ * Allows Inheritance for OOP
+ * @param  {[type]} parent   Super-class
+ * @param  {[type]} newClass Optional - overwrites the constructor for frameworks
+ */
+Function.prototype.extends = function(parent, newClass) {
     this.prototype = Object.create(parent.prototype);
+    this.prototype = new parent();
+    if(newClass !== undefined) this.prototype.constructor = newClass;
 };
 
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
