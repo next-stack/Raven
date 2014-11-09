@@ -2,7 +2,6 @@ var Raven = Raven || {};
 
 Raven.Stage = function(params) {
 	Raven.DisplayObject.apply(this, arguments);
-	this.constructor.name = "Raven.Stage";
 	this.name			= "Raven.Stage";
 	this.sceneIndex		= -1;
 	this.activeScene	= null;
@@ -10,7 +9,7 @@ Raven.Stage = function(params) {
 	return this;
 };
 
-Raven.Stage.extends( Raven.DisplayObject );
+Raven.Stage.extends( Raven.DisplayObject, Raven.Stage );
 
 //////////////////////////////////////////////////
 // Management
@@ -20,7 +19,9 @@ Raven.Stage.prototype.addChild = function(displayObject) {
 	if( !Raven.DisplayObject.prototype.addChild.call(this, displayObject) ) {
 		return false;
 	}
-	displayObject.visible = false;
+	if(displayObject.constructor == Raven.Scene) {
+		displayObject.visible = false;
+	}
 	return true;
 };
 

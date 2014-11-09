@@ -7,8 +7,6 @@ var Raven = Raven || {};
  ************************************************/
 
 Raven.Spring = function(obj, pointer, onUpdate, onComplete) {
-    this.constructor.name = "Raven.Spring";
-
     var start    = 0;
     if(obj && pointer) start = obj[pointer];
 
@@ -30,6 +28,8 @@ Raven.Spring = function(obj, pointer, onUpdate, onComplete) {
     this.bounce    = 0.9;
     return this;
 };
+
+Raven.Spring.prototype.constructor = Raven.Spring;
 
 //////////////////////////////////////////////////
 // Prototype
@@ -87,8 +87,6 @@ Raven.Spring.INTERPOLATION_PRECISION = 0.002;
  ************************************************/
 
 Raven.SpringVec = function(obj, pointer, onUpdate, onComplete) {
-    this.constructor.name = "Raven.SpringVec";
-
     var start    = new Raven.Vec(0, 0, 0);
     if(obj && pointer) start = obj[pointer];
 
@@ -110,6 +108,8 @@ Raven.SpringVec = function(obj, pointer, onUpdate, onComplete) {
     this.bounce    = 0.9;
     return this;
 };
+
+Raven.SpringVec.prototype.constructor = Raven.SpringVec;
 
 //////////////////////////////////////////////////
 // Prototype
@@ -184,11 +184,12 @@ Raven.SpringVec.prototype.isComplete = function() {
  ************************************************/
 
 Raven.SpringController = function() {
-    this.constructor.name = "Raven.SpringController";
     this.springs = [];
     this.springVecs = [];
     return this;
 };
+
+Raven.SpringController.prototype.constructor = Raven.SpringController;
 
 // Global
 Raven.Springy = new Raven.SpringController();

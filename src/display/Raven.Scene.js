@@ -9,7 +9,6 @@ Raven.SceneState = {
 
 Raven.Scene = function(params) {
 	Raven.DisplayObject.apply(this, arguments);
-	this.constructor.name = "Raven.Scene";
 	this.name			= "Raven.Scene_" + Raven.Scene.count.toString();
 	this.showing		= false;
 	this.state			= Raven.SceneState.Scene_Hidden;
@@ -22,7 +21,7 @@ Raven.Scene = function(params) {
 	return this;
 };
 
-Raven.Scene.extends( Raven.DisplayObject );
+Raven.Scene.extends( Raven.DisplayObject, Raven.Scene );
 Raven.Scene.count = 0;
 
 Raven.Scene.prototype.show = function() {

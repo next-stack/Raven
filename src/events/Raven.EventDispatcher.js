@@ -1,9 +1,10 @@
 var Raven = Raven || {};
 
 Raven.EventDispatcher = function() {
-  this.constructor.name = "Raven.EventDispatcher";
   this.listenerChain = {};
 }
+
+Raven.EventDispatcher.prototype.constructor = Raven.EventDispatcher;
 
 Raven.EventDispatcher.prototype.buildListenerChain = function() {
   if( !this.listenerChain ) this.listenerChain = {};

@@ -6,7 +6,6 @@ var Raven = Raven || {};
 
 Raven.CanvasView = function() {
     Raven.View.call(this);
-    this.constructor.name = "Raven.CanvasView";
     this.type = Raven.VIEW_CANVAS;
     this.matrices = [
         new Raven.ViewMatrix()

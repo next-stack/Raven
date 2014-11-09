@@ -2,8 +2,7 @@ var Raven = Raven || {};
 
 Raven.Button = function(params) {
     Raven.DisplayObject.apply(this, arguments);
-
-    this.constructor.name = "Raven.Button";
+    
     this.name           = "Raven.Button_" + Raven.Button.count.toString();
 
     // Booleans
@@ -43,7 +42,7 @@ Raven.Button = function(params) {
     return this;
 };
 
-Raven.Button.extends( Raven.DisplayObject );
+Raven.Button.extends( Raven.DisplayObject, Raven.Button );
 Raven.Button.count = 0;
 
 // Events

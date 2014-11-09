@@ -179,7 +179,6 @@ Raven.Ease = {
  ************************************************/
 
 Raven.CubicEase = function() {
-  this.constructor.name = "Raven.CubicEase";
   var _this = this;
   var BEZIER_SEGMENTS = 12;
   var curves = [0, 0, 0, 0, 0, 0];
@@ -318,7 +317,6 @@ Raven.CubicEase.getPenner = function(ease) {
  ************************************************/
 
 Raven.Tween = function(target, key, to, duration, ease, delay, updateHandler, completeHandler) {
-  this.constructor.name = "Raven.Tween";
   var _this = this,
   active = false;
   
@@ -374,7 +372,6 @@ Raven.Tween = function(target, key, to, duration, ease, delay, updateHandler, co
 }
 
 Raven.TweenCSS = function(target, key, to, duration, ease, delay, updateHandler, completeHandler) {
-  this.constructor.name = "Raven.TweenCSS";
   var _this = this,
   active = false;
   
@@ -430,7 +427,6 @@ Raven.TweenCSS = function(target, key, to, duration, ease, delay, updateHandler,
 }
 
 Raven.TweenController = function() {
-  this.constructor.name = "Raven.TweenController";
   var _this = this;
   var tweens = [];
   this.active = 0;

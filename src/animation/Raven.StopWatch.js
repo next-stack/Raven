@@ -6,7 +6,6 @@ var Raven = Raven || {};
  ************************************************/
 
 Raven.StopWatch = function() {
-  this.constructor.name = "Raven.StopWatch";
   this.initTime = 0;
   this.endTime  = 0;
   this.lastLap  = 0;
@@ -14,6 +13,8 @@ Raven.StopWatch = function() {
   this.time     = 0;
   return this;
 };
+
+Raven.StopWatch.prototype.constructor = Raven.StopWatch;
 
 Raven.StopWatch.prototype = {
   'getTimer': function() {

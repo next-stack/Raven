@@ -1,6 +1,4 @@
 Raven.Spritesheet = function(src, totalFrames, frameRate, loop) {
-  this.constructor.name = "Raven.Spritesheet";
-  
   var _this = this;
   
   this.frameRate = frameRate != null ? frameRate : 60;
@@ -49,3 +47,5 @@ Raven.Spritesheet = function(src, totalFrames, frameRate, loop) {
   }
   return this;
 }
+
+Raven.Spritesheet.prototype.constructor = Raven.Spritesheet;
