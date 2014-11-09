@@ -6,8 +6,7 @@ function AppController(params) {
     this.setup = function(viewElement, width, height, renderer) {
         Raven.App.prototype.setup.call(this, viewElement, width, height, renderer);
         this.view.background.set(32, 32, 32);
-
-        this.stage = new Raven.Stage();
+        
         this.stage.addChild( new DisplayChildrenScene() );
         this.stage.showChild("DisplayChildren");
         return this;
