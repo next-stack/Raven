@@ -1,5 +1,5 @@
 {
-    "name": "raven.js",
+    "name": "raven",
     "version": "2.1.0",
     "description": "Creative coding framework",
     "main": "bin/raven.min.js",
