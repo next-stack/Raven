@@ -1,10 +1,10 @@
 {
     "name": "raven-create",
-    "version": "2.1.0",
+    "version": "2.1.5",
     "description": "Creative coding framework",
-    "main": "raven.min.js",
+    "main": "bin/raven.min.js",
     "files": [
-        "raven.min.js"
+        "bin/raven.min.js"
     ],
     "keywords": [
         "raven",
