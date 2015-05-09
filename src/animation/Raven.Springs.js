@@ -34,6 +34,17 @@ Raven.Spring.prototype.constructor = Raven.Spring;
 //////////////////////////////////////////////////
 // Prototype
 
+Raven.Spring.prototype.set = function(value) {
+    this.value   = value;
+    this.target  = this.value;
+    //
+    // Update object
+    if(this.obj !== undefined && this.pointer !== undefined) {
+        this.obj[this.pointer] = this.value;
+    }
+    return this;
+};
+
 Raven.Spring.prototype.update = function() {
     this.history.push( this.value );
     if(this.history.length > Raven.Spring.historyLength) this.history.shift();
@@ -114,14 +125,28 @@ Raven.SpringVec.prototype.constructor = Raven.SpringVec;
 //////////////////////////////////////////////////
 // Prototype
 
+Raven.SpringVec.prototype.set = function(value) {
+    this.value   = value.copy();
+    this.target  = this.value.copy();
+    //
+    // Update object
+    if(this.obj !== undefined && this.pointer !== undefined) {
+        var obj = this.obj[this.pointer];
+        obj.x = this.value.x;
+        obj.y = this.value.y;
+        obj.z = this.value.z;
+    }
+    return this;
+};
+
 Raven.SpringVec.prototype.update = function() {
     this.history.push( this.value.copy() );
     if(this.history.length > Raven.Spring.historyLength) this.history.shift();
 
-    var force  = this.value.subtractV(this.target).multiply(-this.bounce);
+    var force  = this.value.subtract(this.target).multiply(-this.bounce);
     this.acc   = force.divide(this.mass);
-    this.vel   = this.acc.addV(this.vel).multiply(this.friction);
-    this.value = this.value.addV(this.vel);
+    this.vel   = this.acc.add(this.vel).multiply(this.friction);
+    this.value = this.value.add(this.vel);
 
     // Update object
     if(this.obj !== undefined && this.pointer !== undefined) {

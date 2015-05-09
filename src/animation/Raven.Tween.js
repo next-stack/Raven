@@ -325,8 +325,20 @@ Raven.Tween = function(target, key, to, duration, ease, delay, updateHandler, co
   this.from = 0;
   this.duration = duration * 1000;
   this.timestamp = new Date().getTime() + (delay ? delay * 1000 : 0);
-  this.updateHandler = updateHandler;
-  this.completeHandler = completeHandler;
+  this.updateHandler   = undefined;
+  this.completeHandler = undefined;
+
+  if(updateHandler !== undefined) {
+    this.updateHandler = function() {
+      updateHandler();
+    }
+  }
+
+  if(completeHandler !== undefined) {
+    this.completeHandler = function() {
+      completeHandler();
+    }
+  }
   
   this.start = function() {
     this.from = target[key];
@@ -335,7 +347,7 @@ Raven.Tween = function(target, key, to, duration, ease, delay, updateHandler, co
 
   this.complete = function() {
     target[key] = to;
-    if(this.completeHandler) this.completeHandler();
+    if(this.completeHandler !== undefined) this.completeHandler();
     return this;
   }
   
@@ -349,7 +361,7 @@ Raven.Tween = function(target, key, to, duration, ease, delay, updateHandler, co
     var newValue = ease.getCurvePercent(percent) * this.range() + this.from;
     target[key]  = newValue;
 
-    if(this.updateHandler) this.updateHandler();
+    if(this.updateHandler !== undefined) this.updateHandler();
     return this;
   }
   
@@ -380,8 +392,20 @@ Raven.TweenCSS = function(target, key, to, duration, ease, delay, updateHandler,
   this.from = 0;
   this.duration = duration * 1000;
   this.timestamp = new Date().getTime() + (delay ? delay * 1000 : 0);
-  this.updateHandler = updateHandler;
-  this.completeHandler = completeHandler;
+  this.updateHandler   = undefined;
+  this.completeHandler = undefined;
+
+  if(updateHandler !== undefined) {
+    this.updateHandler = function() {
+      updateHandler();
+    }
+  }
+
+  if(completeHandler !== undefined) {
+    this.completeHandler = function() {
+      completeHandler();
+    }
+  }
   
   this.start = function() {
     this.from = Number( target['style'][key].split('px')[0] );
@@ -390,7 +414,7 @@ Raven.TweenCSS = function(target, key, to, duration, ease, delay, updateHandler,
 
   this.complete = function() {
     target['style'][key] = to.toString() + 'px';
-    if(this.completeHandler) this.completeHandler();
+    if(this.completeHandler !== undefined) this.completeHandler();
     return this;
   }
   
@@ -404,7 +428,7 @@ Raven.TweenCSS = function(target, key, to, duration, ease, delay, updateHandler,
     var newValue = ease.getCurvePercent(percent) * this.range() + this.from;
     target['style'][key]  = newValue.toString() + 'px';
 
-    if(this.updateHandler) this.updateHandler();
+    if(this.updateHandler !== undefined) this.updateHandler();
     return this;
   }
   
@@ -446,7 +470,7 @@ Raven.TweenController = function() {
 
   this.addTweenCSS = function(target, key, to, duration, x0, y0, x1, y1, delay, updateHandler, completeHandler) {
     var ease = new Raven.CubicEase().set(x0, y0, x1, y1);
-    tweens.push( new TweenCSS(target, key, to, duration, ease, delay, updateHandler, completeHandler) );
+    tweens.push( new Raven.TweenCSS(target, key, to, duration, ease, delay, updateHandler, completeHandler) );
     return this;
   }
 
