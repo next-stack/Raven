@@ -36,6 +36,7 @@ Raven.Scene.prototype.show = function() {
 Raven.Scene.prototype.hide = function() {
 	if( !this.showing ) return this; // not showing
 	this.state = Raven.SceneState.Scene_Out;
+	this.animateOut();
 	return this;
 };
 

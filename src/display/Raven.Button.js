@@ -9,6 +9,8 @@ Raven.Button = function(params) {
     this.isEnabled      = false;
     this.isDown         = false;
     this.isOver         = false;
+    this.selectable     = false;
+    this.selected       = false;
 
     // Vectors
     this.touchOffset    = new Raven.Vec(0, 0);
@@ -58,6 +60,7 @@ Raven.Button.prototype.handleEvent = function(evt) {
             if(this.isOver) {
                 this.isDown = true;
                 this.onPress();
+                this.toggle();
                 this.dispatchEvent(new Raven.Event(Raven.Button.CLICK, this));
             }
         break;
@@ -84,6 +87,10 @@ Raven.Button.prototype.render = function(view) {
     else                    view.setFillRGBA(64, 64, 64, a);
     view.drawRect(0, 0, this.width, this.height, true);
     view.setFillB(255);
+    if(this.selectable && this.selected) {
+        view.setStrokeB(255);
+        view.drawRect(0, 0, this.width, this.height, false, true);
+    }
     view.drawFont(this.name, 10, 18);
     return this;
 };
@@ -96,6 +103,22 @@ Raven.Button.prototype.onRollOver           = function() { return this; };
 Raven.Button.prototype.onRollOut            = function() { return this; };
 Raven.Button.prototype.onReleased           = function() { return this; };
 Raven.Button.prototype.onReleasedOutside    = function() { return this; };
+Raven.Button.prototype.onSelect             = function() {
+    if(!this.selectable) return this;
+    if(this.selected)    return this;
+    this.selected = true;
+    return this;
+};
+Raven.Button.prototype.onDeselect           = function() {
+    if(!this.selectable) return this;
+    if(!this.selected)   return this;
+    this.selected = false;
+    return this;
+};
+Raven.Button.prototype.toggle               = function() {
+    this.selected ? this.onDeselect() : this.onSelect();
+    return this;
+};
 
 // Getters
 

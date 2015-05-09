@@ -47,11 +47,16 @@ Raven.Stage.prototype.showScene = function(sceneName) {
 };
 
 Raven.Stage.prototype.showSceneAt = function(displayIndex) {
-	if(displayIndex < 0 || displayIndex >= this.numChildren) return false;
+	if(displayIndex < 0 || displayIndex >= this.numChildren) {
+		return false;
+	}
 	this.nextScene  = this.children[displayIndex];
 	this.sceneIndex = displayIndex;
-	if(!this.activeScene !== null) this.hideCurrentScene();
-	else this.showNextScene();
+	if(this.activeScene !== null) {
+		this.hideCurrentScene();
+	} else {
+		this.showNextScene();
+	}
 	return this;
 };
 
@@ -95,14 +100,16 @@ Raven.Stage.prototype.showNextScene = function() {
 };
 
 Raven.Stage.prototype.hideCurrentScene = function() {
-	this.activeScene.addListener(Raven.Scene.SCENE_IN, this.currentSceneHidden);
+	var _this = this;
+	var currentSceneHidden = function() {
+		_this.activeScene.removeListener(Raven.Scene.SCENE_OUT, currentSceneHidden);
+		_this.activeScene = null;
+		if(_this.nextScene !== null) {
+			_this.showNextScene();
+		}
+	}
+	this.activeScene.addListener(Raven.Scene.SCENE_OUT, currentSceneHidden);
 	this.activeScene.hide();
 	return this;
 };
 
-Raven.Stage.prototype.currentSceneHidden = function() {
-	this.activeScene.removeListener(Raven.Scene.SCENE_IN, this.currentSceneHidden);
-	this.activeScene = null;
-	if(this.nextScene !== null) this.showNextScene();
-	return this;
-};

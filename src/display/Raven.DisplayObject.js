@@ -40,7 +40,7 @@ Raven.DisplayObject.prototype.setup = function(x, y, width, height) {
  */
 Raven.DisplayObject.prototype.dispose = function() {
 	this.parent  = null;
-	var i, total = this.numChildren;
+	var i, total = this.numChildren-1;
 	for(i = total; i > -1; --i) {
 		this.children[i].dispose();
 	}
@@ -248,15 +248,15 @@ Raven.DisplayObject.prototype.removeChild = function(displayObject) {
 
 Raven.DisplayObject.prototype.removeChildAt = function(index) {
 	if(index > -1 && index < this.numChildren) {
-		this.children[i].dispose();
+		this.children[index].dispose();
 		this.children.splice(index, 1);
 	}
 	return this;
 };
 
 Raven.DisplayObject.prototype.removeAllChildren = function() {
-	var i = this.numChildren-1;
-	for(i; i > -1; --i) {
+	var i;
+	for(i = this.numChildren-1; i > -1; --i) {
 		this.removeChildAt(i);
 	}
 	this.children = [];
@@ -331,37 +331,37 @@ Raven.DisplayObject.prototype.__defineGetter__("centerZ", function(){
 // Absolute Position
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteLeft", function(){
-	return this.position.x;
+	return this.position.x + (this.parent !== null ? this.parent.absoluteLeft : 0);
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteTop", function(){
-	return this.position.y;
+	return this.position.y + (this.parent !== null ? this.parent.absoluteTop : 0);
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteFront", function(){
-	return this.position.z;
+	return this.position.z + (this.parent !== null ? this.parent.absoluteFront : 0);;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteRight", function(){
-	return this.size.x + this.position.x;
+	return this.right + (this.parent !== null ? this.parent.absoluteLeft : 0);
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteBottom", function(){
-	return this.size.y + this.position.y;
+	return this.bottom + (this.parent !== null ? this.parent.absoluteTop : 0);
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteBack", function(){
-	return this.size.z + this.position.z;
+	return this.back + (this.parent !== null ? this.parent.absoluteFront : 0);
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteCenterX", function(){
-	return this.size.x * 0.5 + this.position.x;
+	return this.size.x * 0.5 + this.absoluteLeft;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteCenterY", function(){
-	return this.size.x * 0.5 + this.position.y;
+	return this.size.y * 0.5 + this.absoluteTop;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteCenterZ", function(){
-	return this.size.x * 0.5 + this.position.z;
+	return this.size.z * 0.5 + this.absoluteFront;
 });
