@@ -1,0 +1,22 @@
+{
+    "name": "raven.js",
+    "version": "2.1.0",
+    "description": "Creative coding framework",
+    "main": "bin/raven.min.js",
+    "keywords": [
+        "raven",
+        "ravenjs",
+        "raven.js",
+        "3D",
+        "webgl",
+        "canvas"
+    ],
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "*.md",
+        "examples",
+        "src",
+        "styles"
+    ]
+}
