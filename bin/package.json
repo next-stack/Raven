@@ -2,9 +2,9 @@
     "name": "raven-create",
     "version": "2.1.0",
     "description": "Creative coding framework",
-    "main": "bin/raven.min.js",
+    "main": "raven.min.js",
     "files": [
-        "bin/raven.min.js"
+        "raven.min.js"
     ],
     "keywords": [
         "raven",
@@ -15,7 +15,6 @@
         "canvas"
     ],
     "license": "MIT",
-    "main": "./three.js",
     "repository": {
         "type": "git",
         "url": "git://github.com/tomorrowevening/Raven.git"
