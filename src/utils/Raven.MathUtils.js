@@ -17,11 +17,11 @@ Raven.resolveAngle = function( angle ) {
 }
 
 Raven.degToRad = function( degrees ) {
-  return Raven.resolveAngle(degrees) * Raven.RADIANS;
+  return degrees * Raven.RADIANS;
 }
 
 Raven.radToDeg = function( radians ) {
-  return Raven.resolveAngle(radians * Raven.DEGREES);
+  return radians * Raven.DEGREES;
 }
 
 Raven.getAngleRad = function (p1, p2) {
