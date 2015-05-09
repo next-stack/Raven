@@ -64,12 +64,22 @@ Raven.Color = function(r, g, b, a) {
                             Math.round(this.b) + ',' +
                             ( this.a / 255 ) + ')';
      };
+
+     this.gl  = function() {
+        return [
+            this.r / 255,
+            this.g / 255,
+            this.b / 255,
+            this.a / 255
+        ];
+     };
+
      // Setters
      this.set = function(r, g, b, a) {
-         if(r)	this.r = r;
-         if(g)	this.g = g;
-         if(b)	this.b = b;
-         if(a)	this.a = a;
+         if(r !== undefined) this.r = r;
+         if(g !== undefined) this.g = g;
+         if(b !== undefined) this.b = b;
+         if(a !== undefined) this.a = a;
          return this;
      };
      this.setColor = function(rColor) {
@@ -172,9 +182,19 @@ Raven.View.prototype = {
     available: function() { return this.context != null; },
     retinaAvailable: function() { return this.pixelRatio > 1; },
     //
-    setup: function(cElement) {},
+    setup: function(cElement) {
+        this.align      = Raven.Align.TOP_LEFT;
+        this.element    = Raven.element(cElement);
+        this.width      = this.element.width;
+        this.height     = this.element.height;
+    },
     clear: function() {},
-    resize: function(w, h) {},
+    resize: function(w, h) {
+        this.element.width  = w * this.pixelRatio;
+        this.element.height = h * this.pixelRatio;
+        this.width  = w;
+        this.height = h;
+    },
     begin: function() {},
     end: function(fill, stroke) {},
     moveTo: function(x, y) {},
@@ -185,6 +205,7 @@ Raven.View.prototype = {
     drawLine: function(x1, y1, x2, y2) {},
     drawRect: function(x, y, wid, hei, fill, stroke) {},
     drawArc: function(x, y, radius, degrees, angleOffset, fill, stroke) {},
+    drawBezier: function(sx, sy, h0x, h0y, h1x, h1y, ex, ey, fill, stroke) {},
     drawCircle: function(x, y, radius, fill, stroke) {},
     drawPoly: function(x, y, radius, sides, fill, stroke) {},
     drawFont: function(msg, x, y) {},

@@ -77,9 +77,18 @@ Raven.App = function(params) {
 };
 
 Raven.App.prototype = {
+    maxWidth: function() {
+        if( this.view !== null && this.view.element !== undefined ) {
+            return this.view.element.parentNode === document.body ? document.body.clientWidth : this.view.element.parentNode.clientWidth;
+        }
+        return 0;
+    },
+    maxHeight: function() {
+        return window.innerHeight;
+    },
 	checkViewable: function() {
 		if(this.view !== null && this.view.available()) {
-			var wRect = Raven.Rect(window.scrollX, window.scrollY, window.innerWidth, window.innerHeight),
+			var wRect = Raven.Rect(window.scrollX, window.scrollY, this.maxWidth(), this.maxHeight()),
 			aRect = Raven.Rect().mapToDiv(this.view.element),
 			result = aRect.overlap(wRect);
 			return result;
@@ -137,19 +146,21 @@ Raven.App.prototype = {
 		if(viewElement !== undefined && renderer !== undefined) {
 			// Setup the view
             if(renderer == Raven.VIEW_WEBGL) {
-                // Raven.GLView temporarily disabled
-                this.fullscreen ? this.onResize(window.innerWidth, window.innerHeight) : this.onResize(width, height);
-                this.enable();
-                return;
-                // this.view = new Raven.GLView();
-            } else
+                this.view = new Raven.GLView();
+            } else {
                 this.view = new Raven.CanvasView();
+            }
+
             this.view.setup(viewElement);
             this.viewable = Raven.viewable(this.view.element);
 			// Resize view
-			this.fullscreen ? this.onResize(window.innerWidth, window.innerHeight) : this.onResize(width, height);
+			if(this.fullscreen) {
+				this.onResize(this.maxWidth(), this.maxHeight());
+			} else {
+				this.onResize(width, height);
+			}
 			// Clear stage
-			this.view.clear();
+			// if(this.view.autoClear) this.view.clear();
 			// Draw base
 			//this.draw();
 		}
@@ -159,18 +170,21 @@ Raven.App.prototype = {
 	update:  function() {},
 	draw:    function() {
 		if(!this.viewable) return;
-		this.stage.draw(this.view);
+		if(this.view.type == Raven.VIEW_CANVAS) {
+			this.stage.draw(this.view);
 
-		var _align = this.view.align;
-		this.view.align = Raven.Align.TOP_LEFT;
-		this.view.setFillB(0);
-        this.view.drawRect(20, 10, 140, 25, true);
-		this.view.setFillB(255);
-		var output = "Time " + this.timer.seconds.toFixed(2);
-		output += " Frame #" + this.timer.frameNum.toString();
-		this.view.drawFont(output, 25, 25);
-		this.view.drawFont(output, 25, this.view.height-25);
-		this.view.align = _align;
+			var _align = this.view.align;
+			this.view.align = Raven.Align.TOP_LEFT;
+			this.view.setFillB(0);
+			this.view.drawRect(20, 10, 140, 25, true);
+			this.view.setFillB(255);
+			var output = "Time " + this.timer.seconds.toFixed(2);
+			output += " Frame #" + this.timer.frameNum.toString();
+			this.view.drawFont(output, 25, 25);
+			this.view.drawFont(output, 25, this.view.height-25);
+			this.view.align = _align;
+		} else {
+		}
 	},
 	// Handled
 	onKeyDown:   function(key) {},
@@ -187,7 +201,7 @@ Raven.App.prototype = {
 		switch(evt.type) {
 			case Raven.DOM.RESIZE:
                 if(this.view) this.viewable = Raven.viewable( this.view.element );
-				this.onResize( window.innerWidth, window.innerHeight );
+				this.onResize(this.maxWidth(), this.maxHeight());
 				Raven.dispatchEvent( new Raven.Event(Raven.Event.RESIZE) );
 			break;
 			case Raven.DOM.KEY_DOWN:
