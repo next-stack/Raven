@@ -5,39 +5,35 @@ var Raven = Raven || {};
 //////////////////////////////////////////////////
 
 Raven.CanvasView = function() {
-    Raven.View.call(this);
+    Raven.View.apply(this, arguments);
     this.type = Raven.VIEW_CANVAS;
+    this.matrix = new Raven.ViewMatrix();
     this.matrices = [
-        new Raven.ViewMatrix()
+        this.matrix
     ];
     return this;
 };
 
-Raven.CanvasView.prototype = new Raven.View();
-Raven.CanvasView.prototype.constructor = Raven.CanvasView;
-
-Raven.CanvasView.prototype.__defineGetter__("matrix", function(){
-    if(this.matrices.length > 0) {
-        return this.matrices[ this.matrices.length-1 ];
-    }
-    return null;
-});
+Raven.CanvasView.extends( Raven.View, Raven.CanvasView );
 
 Raven.CanvasView.prototype.setup         = function(cElement) {
-    this.align      = Raven.Align.TOP_LEFT;
-    this.element    = Raven.element(cElement);
+    Raven.View.prototype.setup.call(this, cElement)
     this.context    = this.element.getContext('2d');
-    this.width      = this.element.width;
-    this.height     = this.element.height;
     this.context.scale(this.pixelRatio, this.pixelRatio); // auto-enable retina
     return this;
 };
 Raven.CanvasView.prototype.clear         = function() {
-    var _align = this.align;
-    this.align = Raven.Align.TOP_LEFT;
-    this.setFill(this.background);
-    this.drawRect(0, 0, this.width, this.height, true, false);
-    this.align = _align;
+    if(this.autoClear) {
+        this.context.clearRect(0, 0, this.width, this.height);
+    }
+
+    if(this.background.a > 0) {
+        var _align = this.align;
+        this.align = Raven.Align.TOP_LEFT;
+        this.setFill(this.background);
+        this.drawRect(0, 0, this.width, this.height, true, false);
+        this.align = _align;
+    }
     return this;
 };
 Raven.CanvasView.prototype.resize        = function(w, h) {
@@ -113,6 +109,19 @@ Raven.CanvasView.prototype.drawArc       = function(x, y, radius, degrees, angle
     } else {
         this.begin();
         this.context.arc(o.x, o.y, hRad, rOff, rArc, false);
+        this.end(fill, stroke);
+    }
+    return this;
+};
+Raven.CanvasView.prototype.drawBezier = function(sx, sy, h0x, h0y, h1x, h1y, ex, ey, fill, stroke) {
+    if(this.masking) {
+        this.context.beginPath();
+        this.context.moveTo(sx, sy);
+        this.context.bezierCurveTo(h0x, h0y, h1x, h1y, ex, ey);
+    } else {
+        this.begin();
+        this.context.moveTo(sx, sy);
+        this.context.bezierCurveTo(h0x, h0y, h1x, h1y, ex, ey);
         this.end(fill, stroke);
     }
     return this;
@@ -249,7 +258,8 @@ Raven.CanvasView.prototype.translate = function(x, y, z) {
 };
 
 Raven.CanvasView.prototype.pushMatrix = function() {
-    this.matrices.push( new Raven.ViewMatrix() );
+    this.matrix = new Raven.ViewMatrix();
+    this.matrices.push( this.matrix );
 };
 
 Raven.CanvasView.prototype.popMatrix = function() {
@@ -266,4 +276,5 @@ Raven.CanvasView.prototype.popMatrix = function() {
     );
     this.translate( -this.matrix.translate.x, -this.matrix.translate.y, -this.matrix.translate.z );
     this.matrices.pop();
+    if(this.matrices.length > 0) this.matrix = this.matrices[this.matrices.length-1];
 };
