@@ -12,6 +12,14 @@ Raven.Rect = function(x, y, w, h) {
     this.hitTest = function(hx, hy) {
         return Raven.inBounds(hx, hy, this.x, this.y, this.right(), this.bottom());
     };
+    this.clone = function() {
+        return new Raven.Rect(
+            this.x,
+            this.y,
+            this.width,
+            this.height
+        );
+    };
     this.overlap = function(rect) {
         var l = rect.left(),
         t = rect.top(),
@@ -27,6 +35,12 @@ Raven.Rect = function(x, y, w, h) {
         this.width  = div.offsetWidth;
         this.height = div.offsetHeight;
         return this;
+    };
+    this.set = function(x, y, w, h) {
+        if(x !== undefined) this.x = x;
+        if(y !== undefined) this.y = y;
+        if(w !== undefined) this.width  = w;
+        if(h !== undefined) this.height = h;
     };
     return this;
 };

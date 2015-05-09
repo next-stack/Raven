@@ -5,10 +5,10 @@ Raven.Vec = function(px, py, pz) {
     this.y = py !== undefined ? py : 0;
     this.z = pz !== undefined ? pz : 0;
 
-    this.set = function(px, py, pz) {
-        this.x = px;
-        this.y = py;
-        this.z = pz;
+    this.set = function(vx, vy, vz) {
+        if(vx !== undefined) this.x = vx;
+        if(vy !== undefined) this.y = vy;
+        if(vz !== undefined) this.z = vz;
         return this;
     }
 
@@ -22,65 +22,57 @@ Raven.Vec = function(px, py, pz) {
 
     this.add = function(value) {
         var v = this.copy();
-        v.x += value;
-        v.y += value;
-        v.z += value;
-        return v;
-    };
-
-    this.addV = function(vec) {
-        var v = this.copy();
-        v.x += vec.x;
-        v.y += vec.y;
-        v.z += vec.z;
+        if(value.constructor === Object) {
+            v.x += value.x;
+            v.y += value.y;
+            v.z += value.z;
+        } else {
+            v.x += value;
+            v.y += value;
+            v.z += value;
+        }
         return v;
     };
 
     this.divide = function(value) {
         var v = this.copy();
-        v.x /= value;
-        v.y /= value;
-        v.z /= value;
-        return v;
-    };
-
-    this.divideV = function(vec) {
-        var v = this.copy();
-        v.x /= vec.x;
-        v.y /= vec.y;
-        v.z /= vec.z;
-        return v;
-    };
-
-    this.multiplyV = function(vec) {
-        var v = this.copy();
-        v.x *= vec.x;
-        v.y *= vec.y;
-        v.z *= vec.z;
+        if(value.constructor === Object) {
+            v.x /= value.x;
+            v.y /= value.y;
+            v.z /= value.z;
+        } else {
+            v.x /= value;
+            v.y /= value;
+            v.z /= value;
+        }
         return v;
     };
 
     this.multiply = function(value) {
         var v = this.copy();
-        v.x *= value;
-        v.y *= value;
-        v.z *= value;
+        if(value.constructor === Object) {
+            v.x *= value.x;
+            v.y *= value.y;
+            v.z *= value.z;
+        } else {
+            v.x *= value;
+            v.y *= value;
+            v.z *= value;
+        }
         return v;
     };
 
     this.subtract = function(value) {
         var v = this.copy();
-        v.x -= value;
-        v.y -= value;
-        v.z -= value;
-        return v;
-    };
-
-    this.subtractV = function(vec) {
-        var v = this.copy();
-        v.x -= vec.x;
-        v.y -= vec.y;
-        v.z -= vec.z;
+        if(value.constructor === Object) {
+            v.x -= value.x;
+            v.y -= value.y;
+            v.z -= value.z;
+        } else {
+            v.x -= value;
+            v.y -= value;
+            v.z -= value;
+        }
         return v;
     };
 
@@ -92,11 +84,12 @@ Raven.Vec = function(px, py, pz) {
         return Math.sqrt(this.x*this.x + this.y*this.y + this.z*this.z);
     };
 
-    this.normalize = function() {
-        var delimiter = 1.0 / this.length();
-        this.x *= delimiter;
-        this.y *= delimiter;
-        this.z *= delimiter;
+    this.normalize = function(length) {
+        var delimiter = length !== undefined ? length : 1.0;
+        var scale = delimiter / this.length();
+        this.x *= scale;
+        this.y *= scale;
+        this.z *= scale;
         return this;
     };
 
@@ -134,6 +127,19 @@ Raven.Vec = function(px, py, pz) {
         return Raven.getAngleDeg(this, vec);
     };
 
+    this.lerp = function(value, min, max) {
+        if(min.x !== undefined && max.x !== undefined) {
+            this.x = Raven.lerp(value, min.x, max.x);
+        }
+        if(min.y !== undefined && max.y !== undefined) {
+            this.y = Raven.lerp(value, min.y, max.y);
+        }
+        if(min.z !== undefined && max.z !== undefined) {
+            this.z = Raven.lerp(value, min.z, max.z);
+        }
+        return this;
+    };
+
     return this;
 }
 
@@ -158,3 +164,7 @@ Raven.Vec.range = function(minV, maxV, value) {
 Raven.Vec.randomRange = function(minX, minY, minZ, maxX, maxY, maxZ) {
     return new Raven.Vec(Raven.randRange(minX, maxX), Raven.randRange(minY, maxY), Raven.randRange(minZ, maxZ));
 }
+
+Raven.Vec.lerp = function(value, min, max) {
+    return new Raven.Vec().lerp(value, min, max);
+};
