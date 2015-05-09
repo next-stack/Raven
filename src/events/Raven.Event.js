@@ -8,6 +8,7 @@ var Raven = Raven || {};
 Raven.Event = function(type, params) {
     this.type = type;
     this.params = params;
+    this.target = undefined;
     return this;
 };
 
@@ -35,6 +36,7 @@ Raven.ActionEvent = function(type, x, y, index, pressure) {
     this.y = y;
     this.index = index;
     this.pressure = pressure;
+    this.target = undefined;
     return this;
 };
 

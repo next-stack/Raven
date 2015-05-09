@@ -25,10 +25,12 @@ Raven.EventDispatcher.prototype.hasListener = function( type ) {
 }
 
 Raven.EventDispatcher.prototype.removeListener = function( type, listener ) {
-  if( !this.hasEventListener( type ) ) return false;
+  if( !this.hasListener( type ) ) return false;
   var totalListeners = this.listenerChain[type].length;
   for( var i = 0; i < totalListeners; i++ ) {
-    if( this.listenerChain[type][i] == listener ) this.listenerChain.splice( i, 1 );
+    if( this.listenerChain[type][i] == listener ) {
+      this.listenerChain[type].splice( i, 1 );
+    }
   }
 }
 
@@ -39,6 +41,7 @@ Raven.EventDispatcher.prototype.dispatchEvent = function( evtObj ) {
   }
   var types = this.listenerChain[evtObj.type];
   var total = types.length;
+  evtObj.target = this;
   for( var i = 0; i < total; ++i ) types[i](evtObj);
   return true;
 }
