@@ -12,9 +12,7 @@ Raven.Scene = function(params) {
 	this.name			= "Raven.Scene_" + Raven.Scene.count.toString();
 	this.showing		= false;
 	this.state			= Raven.SceneState.Scene_Hidden;
-	this.frameNum		= 0;
-	this.elapsedTime	= 0;
-	this.showStart		= 0;
+	this.timer          = new Raven.Timer();
 	this.timeline		= new Raven.TweenController();
 	this.visible		= false;
 	++Raven.Scene.count;
@@ -25,30 +23,25 @@ Raven.Scene.extends( Raven.DisplayObject, Raven.Scene );
 Raven.Scene.count = 0;
 
 Raven.Scene.prototype.show = function() {
-	if( this.showing ) return this; // already showing
+	if( this.showing ) return false; // already showing
 	this.state = Raven.SceneState.Scene_In;
 	this.showing = true;
 	this.visible = true;
 	this.animateIn();
-	return this;
+	return true;
 };
 
 Raven.Scene.prototype.hide = function() {
-	if( !this.showing ) return this; // not showing
+	if( !this.showing ) return false; // not showing
 	this.state = Raven.SceneState.Scene_Out;
 	this.animateOut();
-	return this;
+	return true;
 };
 
 Raven.Scene.prototype.update = function() {
 	this.timeline.update();
+	this.timer.update();
 	Raven.DisplayObject.prototype.update.call(this);
-	return this;
-};
-
-Raven.Scene.prototype.updateTime = function() {
-	++this.frameNum;
-	this.elapsedTime = Date.now() - this.showStart;
 	return this;
 };
 
@@ -79,6 +72,14 @@ Raven.Scene.prototype.animateOutComplete = function() {
 	this.dispatchEvent( new Raven.Event(Raven.Scene.SCENE_OUT, this) );
 	return this;
 };
+
+Raven.Scene.prototype.__defineGetter__("frameNum", function(){
+	return this.timer.frameNum;
+});
+
+Raven.Scene.prototype.__defineGetter__("elapsedTime", function(){
+	return this.timer.elapsedMS;
+});
 
 Raven.Scene.SCENE_IN	= "Scene::sceneIn";
 Raven.Scene.SCENE_OUT	= "Scene::sceneOut";

@@ -19,7 +19,7 @@ Raven.Stage.prototype.addChild = function(displayObject) {
 	if( !Raven.DisplayObject.prototype.addChild.call(this, displayObject) ) {
 		return false;
 	}
-	if(displayObject.constructor == Raven.Scene) {
+	if(displayObject.constructor == Raven.Scene.constructor) {
 		displayObject.visible = false;
 	}
 	return true;
@@ -88,7 +88,6 @@ Raven.Stage.prototype.updateChildren = function() {
 			}
 		}
 	}
-	if(this.activeScene !== null) this.activeScene.updateTime();
 	return this;
 };
 
