@@ -65,3 +65,7 @@ Raven.removeListener = function( type, listener ) {
 Raven.dispatchEvent = function( evt ) {
   return Raven._dispatcher.dispatchEvent( evt );
 }
+
+Raven.dispatch = function( type, params ) {
+  return Raven._dispatcher.dispatchEvent( new Raven.Event(type, params) );
+}
