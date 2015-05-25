@@ -18,7 +18,6 @@ uglifyjs src/Raven.js \
 		src/display/Raven.Stage.js \
 		src/view/Raven.View.js \
 		src/view/Raven.Canvas.js \
-		src/view/Raven.GL.js \
 		src/view/Raven.App.js \
 		-o bin/raven.min.js \
 		-c \
