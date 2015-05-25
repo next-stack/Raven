@@ -22,7 +22,7 @@ Raven.Vec = function(px, py, pz) {
 
     this.add = function(value) {
         var v = this.copy();
-        if(value.constructor === Object) {
+        if( isNaN(value) ) {
             v.x += value.x;
             v.y += value.y;
             v.z += value.z;
@@ -36,7 +36,7 @@ Raven.Vec = function(px, py, pz) {
 
     this.divide = function(value) {
         var v = this.copy();
-        if(value.constructor === Object) {
+        if( isNaN(value) ) {
             v.x /= value.x;
             v.y /= value.y;
             v.z /= value.z;
@@ -50,7 +50,7 @@ Raven.Vec = function(px, py, pz) {
 
     this.multiply = function(value) {
         var v = this.copy();
-        if(value.constructor === Object) {
+        if( isNaN(value) ) {
             v.x *= value.x;
             v.y *= value.y;
             v.z *= value.z;
@@ -64,7 +64,7 @@ Raven.Vec = function(px, py, pz) {
 
     this.subtract = function(value) {
         var v = this.copy();
-        if(value.constructor === Object) {
+        if( isNaN(value) ) {
             v.x -= value.x;
             v.y -= value.y;
             v.z -= value.z;
