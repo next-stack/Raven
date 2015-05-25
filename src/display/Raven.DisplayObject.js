@@ -129,7 +129,7 @@ Raven.DisplayObject.prototype.drawBounds = function(view) {
 Raven.DisplayObject.prototype.drawChildren = function(view) {
 	var i, total = this.numChildren;
 	for(i = 0; i < total; ++i) {
-		this.children[i].draw(view);
+		if(this.children[i].visible) this.children[i].draw(view);
 	}
 	return this;
 };
