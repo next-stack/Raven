@@ -29,7 +29,6 @@ Raven.DOM = {
 
 (function() {
     var ua = navigator.userAgent.toLowerCase();
-    function check(r) { return r.test(ua); };
     if(/chrome/.test(ua) || /webkit/.test(ua)) {
         Raven.DOM.TRANSFORM_PREFIX = "-webkit-";
     } else if(/opera/.test(ua)) {
@@ -44,7 +43,7 @@ Raven.bind = function(target, event, handler) {
     target[event] = handler;
 };
 
-Raven.unbind = function(target, event, handler) {
+Raven.unbind = function(target, event) {
     target[event] = null;
 };
 
