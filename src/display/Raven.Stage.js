@@ -6,10 +6,26 @@ Raven.Stage = function(params) {
 	this.sceneIndex		= -1;
 	this.activeScene	= null;
 	this.nextScene		= null;
+	this.element        = undefined;
+    this.renderer       = undefined;
 	return this;
 };
 
 Raven.Stage.extends( Raven.DisplayObject, Raven.Stage );
+
+Raven.Stage.prototype.init = function(element) {
+	var domElement = Raven.element( element );
+    this.element   = domElement;
+    return this;
+};
+
+Raven.Stage.prototype.resize = function(w, h) {
+    return this;
+};
+
+Raven.Stage.prototype.setupScenes = function() {
+    return this;
+};
 
 //////////////////////////////////////////////////
 // Management
