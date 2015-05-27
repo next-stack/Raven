@@ -81,7 +81,7 @@ Raven.App.prototype = {
         if( this.view !== null && this.view.element !== undefined ) {
             return this.view.element.parentNode === document.body ? document.body.clientWidth : this.view.element.parentNode.clientWidth;
         }
-        return 0;
+        return window.innerWidth;
     },
     maxHeight: function() {
         return window.innerHeight;
@@ -195,6 +195,7 @@ Raven.App.prototype = {
 	// Handlers
 	onResize:    function(w, h) {
 		if(this.view && this.view.available()) this.view.resize(w, h);
+        this.stage.resize(w, h);
 	},
 	onScroll:    function(evt, x, y) {},
 	evtHandler:  function(evt) {
