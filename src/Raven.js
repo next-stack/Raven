@@ -1,7 +1,8 @@
 "use strict";
 
 window.Raven = {
-  'isMobile': navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/) != null,
+  'canvasSupport': false,
+  'isMobile': navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry)/) !== null,
   
   'include': function(src) {
     var base = "../../src/";
@@ -71,6 +72,23 @@ Function.prototype.extends = function(parent, newClass) {
   };
 }());
 
+/**
+ * Canvas support
+ */
+(function() {
+  var world = document.createElement('canvas');
+  var _gl;
+  try { _gl = world.getContext("webgl"); }
+  catch (x) { _gl = null; }
+
+  if(_gl == null) {
+    try { _gl = world.getContext("experimental-webgl"); experimental = true; }
+    catch (x) { _gl = null; }
+  }
+
+  Raven.canvasSupport = _gl !== null;
+}());
+
 /* Remove before minification
 
 // Geometry
@@ -104,7 +122,6 @@ Raven.include("display/Raven.Stage.js");
 
 // View
 Raven.include("view/Raven.View.js");
-Raven.include("view/Raven.GL.js");
 Raven.include("view/Raven.Canvas.js");
 Raven.include("view/Raven.App.js");
 */
