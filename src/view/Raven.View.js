@@ -89,17 +89,39 @@ Raven.Color = function(r, g, b, a) {
         this.a = rColor.a;
         return this;
      };
+     /**
+      * hex - number - HEX
+      */
+     this.fromHex = function(hex) {
+        var c = Raven.Color.fromHex(hex);
+        this.setColor(c);
+        return this;
+     }
+     /**
+      * hex - string - HEX
+      */
      this.setHex = function(hex) {
         var c = Raven.Color.hexToRGB(hex);
-        this.r = c.r;
-        this.g = c.g;
-        this.b = c.b;
-        this.a = c.a;
+        this.setColor(c);
         return this;
      };
      return this;
 };
 
+/**
+ * hex - number - Example: 0xFFFFFF
+ */
+Raven.Color.fromHex = function(hex) {
+    var col = new Raven.Color();
+    col.r = hex >> 16 & 255;
+    col.g = hex >>  8 & 255;
+    col.b = hex & 255;
+    return col;
+};
+
+/**
+ * hexCode - string - Example: "FF"
+ */
 Raven.Color.getHex = function(hexCode) {
 	var n = parseInt(hexCode, 10);
 	if(isNaN(n)) return "00";
@@ -107,6 +129,9 @@ Raven.Color.getHex = function(hexCode) {
 	return "0123456789ABCDEF".charAt((n-n%16)/16) + "0123456789ABCDEF".charAt(n%16);
 };
 
+/**
+ * hex - string - Example: "#FFFFFF" or "FFFFFF"
+ */
 Raven.Color.hexToRGB = function(hex) {
 	var h = (hex.charAt(0) == "#") ? hex.substring(1, 7) : hex;
 	var r = parseInt(h.substring(0,2), 16);
