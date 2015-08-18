@@ -19,7 +19,8 @@ Raven.CanvasView.extends( Raven.View, Raven.CanvasView );
 Raven.CanvasView.prototype.setup         = function(cElement) {
     Raven.View.prototype.setup.call(this, cElement)
     this.context    = this.element.getContext('2d');
-    this.context.scale(this.pixelRatio, this.pixelRatio); // auto-enable retina
+    // this.context.scale(this.pixelRatio, this.pixelRatio); // auto-enable retina
+    // console.log("Setup canvas:", this.pixelRatio, this.context);
     return this;
 };
 Raven.CanvasView.prototype.clear         = function() {
@@ -39,6 +40,8 @@ Raven.CanvasView.prototype.clear         = function() {
 Raven.CanvasView.prototype.resize        = function(w, h) {
     this.element.width  = w * this.pixelRatio;
     this.element.height = h * this.pixelRatio;
+    this.element.style.width  = w.toString() + "px";
+    this.element.style.height = h.toString() + "px";
     this.width  = w;
     this.height = h;
     return this;
@@ -92,6 +95,27 @@ Raven.CanvasView.prototype.drawRect      = function(x, y, wid, hei, fill, stroke
     } else {
         if(stroke)  this.context.strokeRect(o.x, o.y, wid, hei);
         if(fill)    this.context.fillRect(o.x, o.y, wid, hei);
+    }
+    return this;
+};
+Raven.CanvasView.prototype.drawRoundRect = function(x, y, width, height, radius, fill, stroke) {
+    var o = Raven.Align.getOffset(x, y, width, height, this);
+
+    this.begin();
+    this.context.moveTo(x + radius, y);
+    this.context.lineTo(x + width - radius, y);
+    this.context.quadraticCurveTo(x + width, y, x + width, y + radius);
+    this.context.lineTo(x + width, y + height - radius);
+    this.context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+    this.context.lineTo(x + radius, y + height);
+    this.context.quadraticCurveTo(x, y + height, x, y + height - radius);
+    this.context.lineTo(x, y + radius);
+    this.context.quadraticCurveTo(x, y, x + radius, y);
+    
+    if(!this.masking) {
+        this.context.closePath();
+        if(stroke) this.context.stroke();
+        if(fill)   this.context.fill();
     }
     return this;
 };
@@ -159,7 +183,7 @@ Raven.CanvasView.prototype.drawImage     = function(img, x, y, width, height, xO
     }
     return this;
 };
-Raven.CanvasView.prototype.drawPoly    = function(x, y, radius, sides, fill, stroke) {
+Raven.CanvasView.prototype.drawPoly    = function(x, y, radius, sides, rotation, fill, stroke) {
     if(sides < 2) return this;
     //
     var hRad = radius * 0.5,
@@ -174,8 +198,10 @@ Raven.CanvasView.prototype.drawPoly    = function(x, y, radius, sides, fill, str
     }
 
     var degOffset = (360 / sides) * 0.5;
-    for(i = 0; i < total; ++i) {
-        deg = Raven.degToRad( (i / iTotal) * 360 - degOffset );
+    degOffset -= 90;
+    if(sides === 6) degOffset -= 30;
+    for(i = 0; i < total-1; ++i) {
+        deg = Raven.degToRad( (i / iTotal) * 360 - degOffset + rotation );
         x0 = Math.cos(deg) * radius + o.x;
         y0 = Math.sin(deg) * radius + o.y;
         if(i > 0) {
@@ -184,6 +210,7 @@ Raven.CanvasView.prototype.drawPoly    = function(x, y, radius, sides, fill, str
             this.moveTo(x0, y0);
         }
     }
+    this.context.closePath();
     if(!this.masking) this.end(fill, stroke);
     return this;
 };
