@@ -2,6 +2,7 @@ uglifyjs src/Raven.js \
 		src/geom/Raven.Vec.js \
 		src/geom/Raven.Rect.js \
 		src/utils/Raven.KeyUtils.js \
+		src/utils/Raven.Loader.js \
 		src/utils/Raven.MathUtils.js \
 		src/utils/Raven.TimeUtils.js \
 		src/events/Raven.Event.js \
@@ -13,6 +14,7 @@ uglifyjs src/Raven.js \
 		src/animation/Raven.StopWatch.js \
 		src/animation/Raven.Tween.js \
 		src/display/Raven.DisplayObject.js \
+		src/display/Raven.Shape.js \
 		src/display/Raven.Button.js \
 		src/display/Raven.Scene.js \
 		src/display/Raven.Stage.js \

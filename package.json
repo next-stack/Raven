@@ -1,6 +1,6 @@
 {
     "name": "raven-create",
-    "version": "2.1.5",
+    "version": "2.1.6",
     "description": "Creative coding framework",
     "main": "bin/raven.min.js",
     "files": [

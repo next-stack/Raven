@@ -18,6 +18,9 @@ window.Raven = {
   'element': function(domID) {
     return document.getElementById(domID);
   },
+  'class': function(domClass) {
+    return document.getElementsByClassName(domClass);
+  },
 
   /**
    * To accuractely retrieve the elapsed frames in an app.
@@ -97,6 +100,7 @@ Raven.include("geom/Raven.Rect.js");
 
 // Utilities
 Raven.include("utils/Raven.KeyUtils.js");
+Raven.include("utils/Raven.Loader.js");
 Raven.include("utils/Raven.MathUtils.js");
 Raven.include("utils/Raven.TimeUtils.js");
 
@@ -116,6 +120,7 @@ Raven.include("events/Raven.EventDispatcher.js");
 
 // Display
 Raven.include("display/Raven.DisplayObject.js");
+Raven.include("display/Raven.Shape.js");
 Raven.include("display/Raven.Button.js");
 Raven.include("display/Raven.Scene.js");
 Raven.include("display/Raven.Stage.js");
