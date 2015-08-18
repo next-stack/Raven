@@ -16,16 +16,12 @@ Raven.Shape.prototype.render = function(view) {
     if(!this.loaded || this.image === undefined) return this; // no image
     //
     var img = this.image;
-    var x   = this.position.x;
-    var y   = this.position.y;
     var w   = img.width;
     var h   = img.height;
-    //
-    view.setFillB(102);
-    view.drawRect(x, y, w, h, true);
-    //
-    view.setFillB(255);
-    view.drawImage( img, x, y, w, h, 0, 0 );
+    var a   = view.context.globalAlpha;
+    view.context.globalAlpha = this.alpha;
+    view.drawImage(img, 0, 0, w, h, 0, 0);
+    view.context.globalAlpha = a;
     return this;
 };
 
