@@ -8,6 +8,10 @@ Raven.roundTo = function( value, ordinal ) {
   return Math.round( ordinal * value ) * ( 1 / ordinal );
 }
 
+Raven.bound = function(value, min, max) {
+  return Math.max( min, Math.min(max, value) );
+}
+
 Raven.DEGREES = 180/Math.PI;
 Raven.RADIANS = Math.PI/180;
 
