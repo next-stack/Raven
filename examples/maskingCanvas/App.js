@@ -55,13 +55,13 @@ function AppController(params) {
         g.setLineWidth(1);
 
         // Mask
-        g.setLineWidth(4);
-        g.setStrokeRGB(255, 0, 0);
-        g.pushMatrix();
-        g.translate(x, y);
-        g.rotate(0, 0, rotate);
-        g.drawPoly(-halfR, -halfR, radius, 6, false, true);
-        g.popMatrix();
+        // g.setLineWidth(4);
+        // g.setStrokeRGB(255, 0, 0);
+        // g.pushMatrix();
+        // g.translate(x, y);
+        // g.rotate(0, 0, rotate);
+        // g.drawPoly(-halfR, -halfR, radius, 6, false, true);
+        // g.popMatrix();
 
         return this;
     };
@@ -74,4 +74,4 @@ var app = new AppController({
     'mobile': true
 });
 app.setup("world", 800, 600, Raven.VIEW_CANVAS);
-app.autoRender();
+app.play();

@@ -154,4 +154,5 @@ var app = new AppController({
     'mobile': false
 });
 app.setup("world", 800, 600, Raven.VIEW_CANVAS);
+app.play();
 //app.autoRender();

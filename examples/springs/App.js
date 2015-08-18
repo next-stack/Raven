@@ -100,4 +100,4 @@ function AppController(params) {
 
 var app = new AppController();
 app.setup();
-app.autoRender();
+app.play();

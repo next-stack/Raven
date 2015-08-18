@@ -23,4 +23,4 @@ function AppController(params) {
 
 var app = new AppController();
 app.setup("world");
-app.autoRender();
+app.play();

@@ -3,6 +3,8 @@ AppController.extends( Raven.App );
 function AppController(params) {
     Raven.App.apply(this, arguments);
 
+    var box;
+
     this.camera = undefined;
     this.scene = undefined;
     this.renderer = undefined;
@@ -14,13 +16,20 @@ function AppController(params) {
         return this;
     };
 
+    this.update = function() {
+        Raven.App.prototype.update.call(this);
+        box.rotation.y += Raven.degToRad(1);
+        // box.applyMatrix( new THREE.Matrix4().makeTranslation( 1, 0, 0 ) );
+        return this;
+    };
+
     this.draw = function() {
         // Update camera position
-        var radius = 3;
-        var time = this.frameNum * 0.005;
-        var x = Math.cos(time) * radius,
-            z = Math.sin(time) * radius;
-        this.camera.position.set(x, this.camera.position.y, z);
+        // var radius = 3;
+        // var time = this.frameNum * 0.005;
+        // var x = Math.cos(time) * radius,
+        //     z = Math.sin(time) * radius;
+        // this.camera.position.set(x, this.camera.position.y, z);
         this.camera.lookAt( this.cameraTarget );
 
         // Render scene
@@ -50,15 +59,21 @@ function AppController(params) {
         var geometry = new THREE.PlaneGeometry( 200, 200 );
         var material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
         var mesh = new THREE.Mesh( geometry, material );
+        mesh.position.set(0, -0.5, 0);
         mesh.rotation.x = Raven.degToRad(-90);
         this.scene.add( mesh );
+
+        var container = new THREE.Object3D();
+        this.scene.add( container );
 
         // Placeholder mesh
         var geometry = new THREE.BoxGeometry(1,1,1);
         var material = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
         var mesh = new THREE.Mesh( geometry, material );
-        mesh.position.set(0, 0.5, 0);
-        this.scene.add( mesh );
+        mesh.position.set(5, 0, 0);
+        container.add( mesh );
+        //
+        box = container;
     };
 
     return this;
@@ -66,4 +81,4 @@ function AppController(params) {
 
 var app = new AppController();
 app.setup();
-app.autoRender();
+app.play();
