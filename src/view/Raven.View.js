@@ -50,10 +50,10 @@ Raven.Align = {
 };
 
 Raven.Color = function(r, g, b, a) {
-     this.r = r ? r : 0;
-     this.g = g ? g : 0;
-     this.b = b ? b : 0;
-     this.a = a ? a : 255;
+     this.r = r !== undefined ? r : 0;
+     this.g = g !== undefined ? g : 0;
+     this.b = b !== undefined ? b : 0;
+     this.a = a !== undefined ? a : 255;
      // Getters
      this.copy = function() {
          return new Raven.Color(this.r, this.g, this.b, this.a);
@@ -208,8 +208,9 @@ Raven.View.prototype = {
     retinaAvailable: function() { return this.pixelRatio > 1; },
     //
     setup: function(cElement) {
+        var el          = (typeof cElement === "string") ? Raven.element(cElement) : cElement;
         this.align      = Raven.Align.TOP_LEFT;
-        this.element    = Raven.element(cElement);
+        this.element    = el;
         this.width      = this.element.width;
         this.height     = this.element.height;
     },
@@ -232,7 +233,7 @@ Raven.View.prototype = {
     drawArc: function(x, y, radius, degrees, angleOffset, fill, stroke) {},
     drawBezier: function(sx, sy, h0x, h0y, h1x, h1y, ex, ey, fill, stroke) {},
     drawCircle: function(x, y, radius, fill, stroke) {},
-    drawPoly: function(x, y, radius, sides, fill, stroke) {},
+    drawPoly: function(x, y, radius, sides, rotation, fill, stroke) {},
     drawFont: function(msg, x, y) {},
     drawImage: function(img, x, y, width, height, xOffset, yOffset) {},
     getLineWidth: function() { return 0; },
