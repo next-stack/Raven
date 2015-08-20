@@ -84,6 +84,27 @@ Raven.DisplayObject.prototype.updateChildren = function() {
 };
 
 /**
+ * Updates just the children, and also auto-extends the Display Object's size
+ * if children's position+size exceed it.
+ * @return {Raven.DisplayObject} this
+ */
+Raven.DisplayObject.prototype.updateChildrenBounds = function() {
+    var i, total = this.numChildren;
+    for(i = 0; i < total; ++i) {
+        if(this.children[i].right  > this.size.x) {
+            this.size.x = this.children[i].right;
+        }
+        if(this.children[i].bottom > this.size.y) {
+            this.size.y = this.children[i].bottom;
+        }
+        if(this.children[i].back   > this.size.z) {
+            this.size.z = this.children[i].back;
+        }
+    }
+    return this;
+};
+
+/**
  * Draws the Display Object and its children.
  * @param  {Raven.View} view The Raven.View instance
  * @return {Raven.DisplayObject} this
@@ -185,6 +206,9 @@ Raven.DisplayObject.prototype.pushMatrix = function(view) {
  * @return {Raven.DisplayObject} this
  */
 Raven.DisplayObject.prototype.popMatrix = function(view) {
+    view.scale(  1/view.matrix.scale.x, 1/view.matrix.scale.y, 1/view.matrix.scale.z );
+    view.rotate( -view.matrix.rotate.x, -view.matrix.rotate.y, -view.matrix.rotate.z );
+    view.translate( -view.matrix.translate.x, -view.matrix.translate.y, -view.matrix.translate.z );
     view.popMatrix();
     return this;
 };
