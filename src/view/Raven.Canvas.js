@@ -19,8 +19,6 @@ Raven.CanvasView.extends( Raven.View, Raven.CanvasView );
 Raven.CanvasView.prototype.setup         = function(cElement) {
     Raven.View.prototype.setup.call(this, cElement)
     this.context    = this.element.getContext('2d');
-    // this.context.scale(this.pixelRatio, this.pixelRatio); // auto-enable retina
-    // console.log("Setup canvas:", this.pixelRatio, this.context);
     return this;
 };
 Raven.CanvasView.prototype.clear         = function() {
@@ -291,17 +289,6 @@ Raven.CanvasView.prototype.pushMatrix = function() {
 
 Raven.CanvasView.prototype.popMatrix = function() {
     // Reverse any changes
-    this.rotate( -this.matrix.rotate.x, -this.matrix.rotate.y, -this.matrix.rotate.z );
-    this.scale(  -this.matrix.scale.x,  -this.matrix.scale.y,  -this.matrix.scale.z );
-    this.transform(
-        -this.matrix.transform.a,
-        -this.matrix.transform.b,
-        -this.matrix.transform.c,
-        -this.matrix.transform.d,
-        -this.matrix.transform.e,
-        -this.matrix.transform.f
-    );
-    this.translate( -this.matrix.translate.x, -this.matrix.translate.y, -this.matrix.translate.z );
     this.matrices.pop();
     if(this.matrices.length > 0) this.matrix = this.matrices[this.matrices.length-1];
 };
