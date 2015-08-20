@@ -21,6 +21,12 @@ window.Raven = {
   'class': function(domClass) {
     return document.getElementsByClassName(domClass);
   },
+  'delay': function(length, delayedFunc, params) {
+    var timer = setTimeout( function() {
+      clearTimeout( timer );
+      delayedFunc(params);
+    }, length * 1000 );
+  },
 
   /**
    * To accuractely retrieve the elapsed frames in an app.
@@ -92,7 +98,7 @@ Function.prototype.extends = function(parent, newClass) {
   Raven.canvasSupport = _gl !== null;
 }());
 
-/* Remove before minification
+// Remove before minification
 
 // Geometry
 Raven.include("geom/Raven.Vec.js");
@@ -129,4 +135,4 @@ Raven.include("display/Raven.Stage.js");
 Raven.include("view/Raven.View.js");
 Raven.include("view/Raven.Canvas.js");
 Raven.include("view/Raven.App.js");
-*/
+//
