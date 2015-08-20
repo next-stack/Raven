@@ -46,6 +46,10 @@ Raven.EventDispatcher.prototype.dispatchEvent = function( evtObj ) {
   return true;
 }
 
+Raven.EventDispatcher.prototype.dispatch = function( type, params ) {
+  return this.dispatchEvent( new Raven.Event(type, params) );
+}
+
 //
 
 Raven._dispatcher = new Raven.EventDispatcher(); // Singleton instance
@@ -67,5 +71,5 @@ Raven.dispatchEvent = function( evt ) {
 }
 
 Raven.dispatch = function( type, params ) {
-  return Raven._dispatcher.dispatchEvent( new Raven.Event(type, params) );
+  return Raven._dispatcher.dispatch( type, params );
 }
