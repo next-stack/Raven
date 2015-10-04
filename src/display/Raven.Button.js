@@ -49,7 +49,9 @@ Raven.Button.count = 0;
 
 // Events
 
-Raven.Button.CLICK          = "ravenClick";
+Raven.Button.CLICK           = "ravenClick";
+Raven.Button.RELEASE         = "ravenRelease";
+Raven.Button.RELEASE_OUTSIDE = "ravenReleaseOutside";
 
 Raven.Button.prototype.handleEvent = function(evt) {
     var  wasOver = this.isOver;
@@ -61,6 +63,7 @@ Raven.Button.prototype.handleEvent = function(evt) {
                 this.isDown = true;
                 this.onPress();
                 this.toggle();
+                this.dispatchEvent(new Raven.Event(Raven.ActionEvent.DOWN, this));
                 this.dispatchEvent(new Raven.Event(Raven.Button.CLICK, this));
             }
         break;
@@ -74,7 +77,14 @@ Raven.Button.prototype.handleEvent = function(evt) {
         break;
         case Raven.ActionEvent.UP:
             this.isDown = false;
-            this.isOver ? this.onReleased() : this.onReleasedOutside();
+            this.dispatchEvent(new Raven.Event(Raven.ActionEvent.UP, this));
+            if(this.isOver) {
+                this.dispatchEvent(new Raven.Event(Raven.Button.RELEASE, this));
+                this.onReleased();
+            } else {
+                this.dispatchEvent(new Raven.Event(Raven.Button.RELEASE_OUTSIDE, this));
+                this.onReleasedOutside();
+            }
         break;
     }
     return this;

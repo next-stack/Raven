@@ -4,6 +4,10 @@ Raven.fix = function(value, hundredth) {
   return Number(value.toFixed(hundredth));
 }
 
+Raven.roundBy = function(value, dividend) {
+  return Math.round( Math.abs(value) / dividend ) * dividend;
+}
+
 Raven.roundTo = function( value, ordinal ) {
   return Math.round( ordinal * value ) * ( 1 / ordinal );
 }
@@ -102,7 +106,7 @@ Raven.bezierPosition = function(t, p0, c0, c1, p1) {
 }
 
 Raven.bezierVelocity = function(t, p0, c0, c1, p1) {
-  return (3*c0-3*p0)+2*(3*p0-6*c0+3*c1)*t+3*(-p0+3*c0-3*c1+p1)*t*t;
+  return (3 * c0 - 3 * p0) + 2 * (3 * p0 - 6 * c0 + 3 * c1) * t + 3 * (-p0 + 3 * c0 - 3 * c1 + p1) * t * t;
 }
 
 Raven.lerp = function(value, min, max) {

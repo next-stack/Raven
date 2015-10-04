@@ -21,47 +21,34 @@ function AppController(params) {
         var rotate = time * 1.5,
         x = Raven.cosRange(time*(Math.PI * 0.5), 450, 50),
         y = Raven.cosRange(time*1, 200, 200);
+        x = 200;
+        y = 200;
+        // rotate = 0;
+        // radius = 200;
+        // halfR  = radius / 2;
         g.context.font = "48px Helvetica";
+
+        g.setFillB(102);
+        g.setStrokeB(102);
 
         // Begin Masking
         g.beginMask();
 
-        // Draw mask
-        g.pushMatrix();
-        g.translate(x, y);
-        g.rotate(0, 0, rotate);
-        g.drawPoly(-halfR, -halfR, radius, 6);
-        g.popMatrix();
+        // Mask shape
+        g.drawPoly(x-halfR, y-halfR, radius, 6, 0, true);
 
         // Mask complete
         g.endMask();
 
         // Draw masked content
-        g.setFillB(102);
-        g.drawCircle(100, 100, 400, true);
-        g.setFillB(255);
-        g.drawFont("Hello world", 180, 318);
+        // g.drawCircle(200, 200, 400, true);
+        g.drawRect(100, 100, 400, 300, true);
 
-        // Stop content from being masked
+        // Stop masking
         g.stopMask();
 
-        // Now let's redraw the same content, out of mask but outlined,
-        // so we can still watch over the masked animation
-
-        // Content
-        g.setLineWidth(2);
-        g.setStrokeB(128);
-        g.drawCircle(100, 100, 400, false, true);
-        g.setLineWidth(1);
-
-        // Mask
-        // g.setLineWidth(4);
-        // g.setStrokeRGB(255, 0, 0);
-        // g.pushMatrix();
-        // g.translate(x, y);
-        // g.rotate(0, 0, rotate);
-        // g.drawPoly(-halfR, -halfR, radius, 6, false, true);
-        // g.popMatrix();
+        // After mask
+        g.drawPoly(x-halfR, y-halfR, radius, 6, 0, false, true);
 
         return this;
     };

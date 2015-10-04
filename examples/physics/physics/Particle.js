@@ -15,7 +15,7 @@ function Particle(x, y, z) {
 };
 
 Particle.PRECISION = 0.02;
-Particle.HISTORY   = 10;
+Particle.HISTORY   = 1;
 
 Particle.prototype.update = function(time) {
     if(this.history.length >= Particle.HISTORY) {
@@ -47,8 +47,8 @@ Particle.prototype.drawHistory = function(g) {
 };
 
 Particle.prototype.force = function(angleRadians, effect) {
-    this.vel.x -= Math.cos(angleRadians) * effect;
-    this.vel.y -= Math.sin(angleRadians) * effect;
+    this.vel.x += Math.cos(angleRadians) * effect;
+    this.vel.y += Math.sin(angleRadians) * effect;
     return this;
 };
 

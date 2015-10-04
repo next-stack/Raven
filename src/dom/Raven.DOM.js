@@ -1,6 +1,12 @@
 var Raven = Raven || {};
 
 Raven.DOM = {
+    "iPad":           /iPad/i.test(  navigator.userAgent),
+    "iPhone":         /iPhone/i.test(navigator.userAgent),
+    "isChrome":       /chrome/i.test(navigator.userAgent),
+    "isSafari":       /^((?!chrome).)*safari/i.test(navigator.userAgent),
+    "isFirefox":      navigator.userAgent.indexOf('Firefox') > -1,
+    "isOpera":        navigator.userAgent.toLowerCase().indexOf("op") > -1,
     "TRANSFORM_PREFIX": "",
 	// Events
 	// Window
@@ -36,6 +42,8 @@ Raven.DOM = {
     } else if(/msie/.test(ua)) {
         Raven.DOM.TRANSFORM_PREFIX = "-ms-";
     }
+    if( Raven.DOM.isChrome && Raven.DOM.isSafari ) Raven.DOM.isSafari = false;
+    if( Raven.DOM.isChrome && Raven.DOM.isOpera )  Raven.DOM.isChrome = false;
 })()
 
 // Event handling

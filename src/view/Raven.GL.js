@@ -1,87 +1,104 @@
 var Raven = Raven || {};
+var gl;
 
-Raven.Mesh = function(verts, texCoords, colors) {
-	this.mode = Raven.Mesh.PRIM_TRIANGLE_STRIP;
-	var hasVerts  = verts     !== undefined && verts.length > 0,
-		hasUVs    = texCoords !== undefined && texCoords.length > 0,
-		hasColors = colors    !== undefined && colors.length > 0;
-	// Vertex
-	if(hasVerts) {
-		this.bufferVertex = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferVertex);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(verts), gl.STATIC_DRAW);
-	}
-	// UV
-	if(hasUVs) {
-		this.bufferUV = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferUV);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(texCoords), gl.STATIC_DRAW);
-	}
-	// Colors
-	if(hasColors) {
-		this.bufferColor = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferColor);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-	}
-	//
-	this.draw = function(program) {
-		if(hasVerts) {
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferVertex);
-			gl.vertexAttribPointer(program.aPosition, 3, gl.FLOAT, false, 0, 0);
-		}
-		if(hasUVs) {
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferUV);
-			gl.vertexAttribPointer(program.aTexCoord, 2, gl.FLOAT, false, 0, 0);
-		}
-		if(hasColors) {
-			gl.bindBuffer(gl.ARRAY_BUFFER, this.bufferColor);
-			gl.vertexAttribPointer(program.aColor, 4, gl.FLOAT, false, 0, 0);
-		}
-		gl.drawArrays(this.mode, 0, verts.length / 3);
-	};
+//////////////////////////////////////////////////
+// WebGL
+//////////////////////////////////////////////////
+
+Raven.GLView = function() {
+    Raven.View.apply(this, arguments);
+    this.type = Raven.VIEW_WEBGL;
+    return this;
+};
+
+Raven.GLView.extends( Raven.View, Raven.GLView );
+
+Raven.GLView.prototype.setup = function(cElement) {
+	Raven.View.prototype.setup.call(this, cElement);
+
+    try {
+        if( this.element.getContext("webgl") !== undefined ) {
+            gl = this.element.getContext("webgl");
+        } else {
+            gl = this.element.getContext("experimental-webgl");
+        }
+        gl.viewportWidth  = this.width;
+        gl.viewportHeight = this.height;
+        this.context      = gl;
+    } catch(err) {
+        console.error("Error initing WebGL", err);
+        return false;
+    }
+
 	return this;
 };
 
-// Draw mode
-Raven.Mesh.PRIM_POINTS			= 0;
-Raven.Mesh.PRIM_LINES			= 1;
-Raven.Mesh.PRIM_LINE_LOOP		= 2;
-Raven.Mesh.PRIM_LINE_STRIP		= 3;
-Raven.Mesh.PRIM_TRIANGLES		= 4;
-Raven.Mesh.PRIM_TRIANGLE_STRIP	= 5;
-Raven.Mesh.PRIM_TRIANGLE_FAN	= 6;
-
-Raven.Mesh.Plane = function(x, y, z, wid, hei, rows, columns) {
-	var verts  = [
-		x,		y,		z,
-		x+wid,	y,		z,
-		x,		y+hei,	z,
-		x+wid,	y+hei,	z
-	];
-	var UVs    = [
-		0,	0,
-		1,	0,
-		0,	1,
-		1,	1
-	];
-	var colors = [
-		1.0,	1.0,	1.0,	1.0,
-		1.0,	1.0,	1.0,	1.0,
-		1.0,	1.0,	1.0,	1.0,
-		1.0,	1.0,	1.0,	1.0
-	];
-	return new Raven.Mesh(verts, UVs, colors);
+Raven.GLView.prototype.resize        = function(w, h) {
+    this.element.width  = w * this.pixelRatio;
+    this.element.height = h * this.pixelRatio;
+    this.width  = w;
+    this.height = h;
+    gl.viewportWidth  = w;
+    gl.viewportHeight = h;
+    this.context      = gl;
+    return this;
 };
 
-Raven.Shader = function(type, src) {
-	this.shader = gl.createShader(type);
-	gl.shaderSource(this.shader, src);
-	gl.compileShader(this.shader);
-	if(!gl.getShaderParameter(this.shader, gl.COMPILE_STATUS)) {
-		console.warn("Could not compile Shader:\n", src);
-		return null;
-	}
-	this.begin = function() {};
-	this.end   = function() {};
-	return this;
+/*
+Raven.View = function() {
+    var _this = this;
+    this.align      = Raven.Align.TOP_LEFT;
+    this.autoClear	= true;
+    this.background	= Raven.Color.black();
+    this.element	= null;
+    this.context	= null;
+    this.pixelRatio	= window.devicePixelRatio;
+    this.width		= 0;
+    this.height		= 0;
+    this.type       = -1;
+    this.masking    = false;
+    return this;
 };
+
+Raven.View.prototype = {
+    available: function() { return this.context != null; },
+    retinaAvailable: function() { return this.pixelRatio > 1; },
+    //
+    setup: function(cElement) {},
+    clear: function() {},
+    resize: function(w, h) {},
+    begin: function() {},
+    end: function(fill, stroke) {},
+    moveTo: function(x, y) {},
+    lineTo: function(x, y) {},
+    beginMask: function() {},
+    endMask: function() {},
+    stopMask: function() {},
+    drawLine: function(x1, y1, x2, y2) {},
+    drawRect: function(x, y, wid, hei, fill, stroke) {},
+    drawArc: function(x, y, radius, degrees, angleOffset, fill, stroke) {},
+    drawCircle: function(x, y, radius, fill, stroke) {},
+    drawPoly: function(x, y, radius, sides, fill, stroke) {},
+    drawFont: function(msg, x, y) {},
+    drawImage: function(img, x, y, width, height, xOffset, yOffset) {},
+    getLineWidth: function() { return 0; },
+    setLineWidth: function(w) {},
+    setFill: function(color) {},
+    setFillB: function(brightness) {},
+    setFillHex: function(hex) {},
+    setFillRGB: function(r, g, b) {},
+    setFillRGBA: function(r, g, b, a) {},
+    setStroke: function(color) {},
+    setStrokeB: function(brightness) {},
+    setStrokeHex: function(hex) {},
+    setStrokeRGB: function(r, g, b) {},
+    setStrokeRGBA: function(r, g, b, a) {},
+    //
+    pushMatrix: function() {},
+    popMatrix: function() {},
+    rotate: function(x, y, z) {},
+    scale: function(x, y, z) {},
+    transform: function(a, b, c, d, e, f) {},
+    translate: function(x, y, z) {}
+};
+*/

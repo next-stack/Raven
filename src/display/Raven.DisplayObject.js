@@ -112,11 +112,17 @@ Raven.DisplayObject.prototype.updateChildrenBounds = function() {
 Raven.DisplayObject.prototype.draw = function(view) {
     if(!this.visible) return this;
 
+    var alpha = view.context.globalAlpha;
+    view.context.globalAlpha = this.opacity;
+
     this.pushMatrix(view);
     this.render(view);
     this.drawChildren(view);
     this.popMatrix(view);
     this.drawAfter(view);
+
+    view.context.globalAlpha = alpha;
+
     return this;
 };
 
@@ -137,8 +143,9 @@ Raven.DisplayObject.prototype.drawAfter = function(view) {
  */
 Raven.DisplayObject.prototype.drawBounds = function(view) {
     this.pushMatrix(view);
-    view.setStrokeRGBA(255, 0, 0, 255 * this.opacity);
-    view.drawRect(0, 0, this.size.x, this.size.y, false, true);
+    //view.setStrokeRGBA(255, 0, 0, 255 * this.opacity);
+    view.setStrokeRGB(255, 0, 0);
+    view.drawRect(0, 0, this.width, this.height, false, true);
     this.popMatrix(view);
     return this;
 };
@@ -196,7 +203,8 @@ Raven.DisplayObject.prototype.pushMatrix = function(view) {
     view.translate(x, y, z);
     view.rotate(this.rotation.x, this.rotation.y, this.rotation.z);
     view.scale(this.scale.x, this.scale.y, this.scale.z);
-    view.setFillRGBA(255, 255, 255, this.opacity * 255);
+    view.setFillB(255);
+    //view.setFillRGBA(255, 255, 255, this.opacity * 255);
     return this;
 };
 
@@ -307,67 +315,81 @@ Raven.DisplayObject.prototype.__defineGetter__("opacity", function(){
 // Size
 
 Raven.DisplayObject.prototype.__defineGetter__("width", function(){
-    return this.size.x;
+    if(this.parent !== null) return this.size.x * this.scale.x * this.parent.scale.x;
+    return this.size.x * this.scale.x;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("height", function(){
-    return this.size.y;
+    if(this.parent !== null) return this.size.y * this.scale.y * this.parent.scale.y;
+    return this.size.y * this.scale.y;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("depth", function(){
-    return this.size.z;
+    if(this.parent !== null) return this.size.z * this.scale.z * this.parent.scale.z;
+    return this.size.z * this.scale.z;
 });
 
 // Position
 
 Raven.DisplayObject.prototype.__defineGetter__("left", function(){
+    if(this.parent !== null) return this.parent.scale.x * this.position.x;
     return this.position.x;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("top", function(){
+    if(this.parent !== null) return this.parent.scale.y * this.position.y;
     return this.position.y;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("front", function(){
+    if(this.parent !== null) return this.parent.scale.z * this.position.z;
     return this.position.z;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("right", function(){
-    return this.size.x + this.position.x;
+    return this.left + this.width;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("bottom", function(){
-    return this.size.y + this.position.y;
+    return this.top  + this.height;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("back", function(){
-    return this.size.z + this.position.z;
+    return this.front + this.depth;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("centerX", function(){
-    return this.size.x * 0.5 + this.position.x;
+    return this.width / 2 + this.left;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("centerY", function(){
-    return this.size.y * 0.5 + this.position.y;
+    return this.height / 2 + this.top;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("centerZ", function(){
-    return this.size.z * 0.5 + this.position.z;
+    return this.depth / 2 + this.front;
+});
+
+Raven.DisplayObject.prototype.__defineGetter__("center", function(){
+    return new Raven.Vec( this.centerX, this.centerY, this.centerZ );
 });
 
 // Absolute Position
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteLeft", function(){
-    return this.position.x + (this.parent !== null ? this.parent.absoluteLeft : 0);
+    return this.left + (this.parent !== null ? this.parent.absoluteLeft : 0);
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteTop", function(){
-    return this.position.y + (this.parent !== null ? this.parent.absoluteTop : 0);
+    return this.top + (this.parent !== null ? this.parent.absoluteTop : 0);
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteFront", function(){
-    return this.position.z + (this.parent !== null ? this.parent.absoluteFront : 0);;
+    return this.front + (this.parent !== null ? this.parent.absoluteFront : 0);;
+});
+
+Raven.DisplayObject.prototype.__defineGetter__("absolutePos", function(){
+    return new Raven.Vec( this.absoluteLeft, this.absoluteTop, this.absoluteFront );
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteRight", function(){
@@ -383,13 +405,13 @@ Raven.DisplayObject.prototype.__defineGetter__("absoluteBack", function(){
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteCenterX", function(){
-    return this.size.x * 0.5 + this.absoluteLeft;
+    return this.width * 0.5 + this.absoluteLeft;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteCenterY", function(){
-    return this.size.y * 0.5 + this.absoluteTop;
+    return this.height * 0.5 + this.absoluteTop;
 });
 
 Raven.DisplayObject.prototype.__defineGetter__("absoluteCenterZ", function(){
-    return this.size.z * 0.5 + this.absoluteFront;
+    return this.depth * 0.5 + this.absoluteFront;
 });

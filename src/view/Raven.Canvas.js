@@ -38,10 +38,10 @@ Raven.CanvasView.prototype.clear         = function() {
 Raven.CanvasView.prototype.resize        = function(w, h) {
     this.element.width  = w * this.pixelRatio;
     this.element.height = h * this.pixelRatio;
-    this.element.style.width  = w.toString() + "px";
-    this.element.style.height = h.toString() + "px";
-    this.width  = w;
-    this.height = h;
+    this.element.style.width  = (w).toString() + "px";
+    this.element.style.height = (h).toString() + "px";
+    this.width  = w * this.pixelRatio;
+    this.height = h * this.pixelRatio;
     return this;
 };
 Raven.CanvasView.prototype.begin         = function() {
@@ -83,21 +83,31 @@ Raven.CanvasView.prototype.drawLine      = function(x1, y1, x2, y2) {
     return this;
 };
 Raven.CanvasView.prototype.drawRect      = function(x, y, wid, hei, fill, stroke) {
-    var o = Raven.Align.getOffset(x, y, wid, hei, this);
     if(this.masking) {
         this.begin();
-        this.moveTo(o.x, o.y);
-        this.lineTo(o.x, o.y+hei);
-        this.lineTo(o.x+wid, o.y+hei);
-        this.lineTo(o.x+wid, o.y);
+        this.moveTo(x, y);
+        this.lineTo(x, y+hei);
+        this.lineTo(x+wid, y+hei);
+        this.lineTo(x+wid, y);
     } else {
-        if(stroke)  this.context.strokeRect(o.x, o.y, wid, hei);
-        if(fill)    this.context.fillRect(o.x, o.y, wid, hei);
+        if(stroke)  this.context.strokeRect(x, y, wid, hei);
+        if(fill)    this.context.fillRect(x, y, wid, hei);
     }
+    // var o = Raven.Align.getOffset(x, y, wid, hei, this);
+    // if(this.masking) {
+    //     this.begin();
+    //     this.moveTo(o.x, o.y);
+    //     this.lineTo(o.x, o.y+hei);
+    //     this.lineTo(o.x+wid, o.y+hei);
+    //     this.lineTo(o.x+wid, o.y);
+    // } else {
+    //     if(stroke)  this.context.strokeRect(o.x, o.y, wid, hei);
+    //     if(fill)    this.context.fillRect(o.x, o.y, wid, hei);
+    // }
     return this;
 };
 Raven.CanvasView.prototype.drawRoundRect = function(x, y, width, height, radius, fill, stroke) {
-    var o = Raven.Align.getOffset(x, y, width, height, this);
+    // var o = Raven.Align.getOffset(x, y, width, height, this);
 
     this.begin();
     this.context.moveTo(x + radius, y);
@@ -121,18 +131,25 @@ Raven.CanvasView.prototype.drawArc       = function(x, y, radius, degrees, angle
     if(degrees - angleOffset >= 360) {
         return this.drawCircle(x, y, radius, fill, stroke);
     }
-    var hRad = radius * 0.5,
-    o = Raven.Align.getOffset(x+hRad, y+hRad, radius, radius, this);
+    var hRad = radius * 0.5;
     var rArc = Raven.degToRad(degrees),
         rOff = Raven.degToRad(angleOffset);
     if(this.masking) {
         this.context.beginPath();
-        this.context.arc(o.x, o.y, hRad, rOff, rArc, false);
+        this.context.arc(x, y, hRad, rOff, rArc, false);
     } else {
         this.begin();
-        this.context.arc(o.x, o.y, hRad, rOff, rArc, false);
+        this.context.arc(x, y, hRad, rOff, rArc, false);
         this.end(fill, stroke);
     }
+    // if(this.masking) {
+    //     this.context.beginPath();
+    //     this.context.arc(o.x, o.y, hRad, rOff, rArc, false);
+    // } else {
+    //     this.begin();
+    //     this.context.arc(o.x, o.y, hRad, rOff, rArc, false);
+    //     this.end(fill, stroke);
+    // }
     return this;
 };
 Raven.CanvasView.prototype.drawBezier = function(sx, sy, h0x, h0y, h1x, h1y, ex, ey, fill, stroke) {
@@ -149,16 +166,24 @@ Raven.CanvasView.prototype.drawBezier = function(sx, sy, h0x, h0y, h1x, h1y, ex,
     return this;
 };
 Raven.CanvasView.prototype.drawCircle    = function(x, y, radius, fill, stroke) {
-    var hRad = radius * 0.5,
-    o = Raven.Align.getOffset(x+hRad, y+hRad, radius, radius, this);
+    var hRad = radius * 0.5;
     if(this.masking) {
         this.context.beginPath();
-        this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
+        this.context.arc(x, y, hRad, 0, Math.PI*2, false);
     } else {
         this.begin();
-        this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
+        this.context.arc(x, y, hRad, 0, Math.PI*2, false);
         this.end(fill, stroke);
     }
+    // o = Raven.Align.getOffset(x+hRad, y+hRad, radius, radius, this);
+    // if(this.masking) {
+    //     this.context.beginPath();
+    //     this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
+    // } else {
+    //     this.begin();
+    //     this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
+    //     this.end(fill, stroke);
+    // }
     return this;
 };
 Raven.CanvasView.prototype.drawCurve     = function(sx, sy, cx, cy, ex, ey, fill, stroke) {
@@ -173,24 +198,30 @@ Raven.CanvasView.prototype.drawFont      = function(msg, x, y) {
     return this;
 };
 Raven.CanvasView.prototype.drawImage     = function(img, x, y, width, height, xOffset, yOffset) {
-    var o = Raven.Align.getOffset(x, y, width, height, this);
     if(xOffset !== undefined && yOffset !== undefined) {
-        this.context.drawImage(img, xOffset, yOffset, width, height, o.x, o.y, width, height);
+        this.context.drawImage(img, xOffset, yOffset, width, height, x, y, width, height);
     } else {
-        this.context.drawImage(img, 0, 0, width, height, o.x, o.y, width, height);
+        this.context.drawImage(img, 0, 0, width, height, x, y, width, height);
     }
+    // var o = Raven.Align.getOffset(x, y, width, height, this);
+    // if(xOffset !== undefined && yOffset !== undefined) {
+    //     this.context.drawImage(img, xOffset, yOffset, width, height, o.x, o.y, width, height);
+    // } else {
+    //     this.context.drawImage(img, 0, 0, width, height, o.x, o.y, width, height);
+    // }
     return this;
 };
 Raven.CanvasView.prototype.drawPoly    = function(x, y, radius, sides, rotation, fill, stroke) {
     if(sides < 2) return this;
     //
-    var hRad = radius * 0.5,
-    o = Raven.Align.getOffset(x+hRad, y+hRad, radius, radius, this);
+    var hRad = radius * 0.5;
+    // o = Raven.Align.getOffset(x+hRad, y+hRad, radius, radius, this);
     var i, x0, y0, deg, total = sides+1, iTotal = sides;
     
     if(this.masking) {
         this.context.beginPath();
-        this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
+        this.context.arc(x, y, hRad, 0, Math.PI*2, false);
+        // this.context.arc(o.x, o.y, hRad, 0, Math.PI*2, false);
     } else {
         this.begin();
     }
@@ -200,8 +231,10 @@ Raven.CanvasView.prototype.drawPoly    = function(x, y, radius, sides, rotation,
     if(sides === 6) degOffset -= 30;
     for(i = 0; i < total-1; ++i) {
         deg = Raven.degToRad( (i / iTotal) * 360 - degOffset + rotation );
-        x0 = Math.cos(deg) * radius + o.x;
-        y0 = Math.sin(deg) * radius + o.y;
+        x0 = Math.cos(deg) * radius + x;
+        y0 = Math.sin(deg) * radius + y;
+        // x0 = Math.cos(deg) * radius + o.x;
+        // y0 = Math.sin(deg) * radius + o.y;
         if(i > 0) {
             this.lineTo(x0, y0);
         } else {

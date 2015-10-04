@@ -12,10 +12,10 @@ uglifyjs src/Raven.js \
 		src/animation/Raven.Springs.js \
 		src/animation/Raven.Spritesheet.js \
 		src/animation/Raven.StopWatch.js \
-		src/animation/Raven.Tween.js \
+		src/animation/Raven.NewTween.js \
 		src/display/Raven.DisplayObject.js \
-		src/display/Raven.Shape.js \
 		src/display/Raven.Button.js \
+		src/display/Raven.Shape.js \
 		src/display/Raven.Scene.js \
 		src/display/Raven.Stage.js \
 		src/view/Raven.View.js \

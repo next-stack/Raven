@@ -15,6 +15,13 @@ window.Raven = {
     return instance;
   },
 
+  'isArray': function(obj) {
+    return Object.prototype.toString.call( obj ) === '[object Array]';
+  },
+  'isString': function(obj) {
+    return typeof obj === 'string';
+  },
+
   'element': function(domID) {
     return document.getElementById(domID);
   },
@@ -118,7 +125,7 @@ Raven.include("dom/Raven.CSS.js");
 Raven.include("animation/Raven.Springs.js");
 Raven.include("animation/Raven.Spritesheet.js");
 Raven.include("animation/Raven.StopWatch.js");
-Raven.include("animation/Raven.Tween.js");
+Raven.include("animation/Raven.NewTween.js");
 
 // Events
 Raven.include("events/Raven.Event.js");
@@ -126,8 +133,8 @@ Raven.include("events/Raven.EventDispatcher.js");
 
 // Display
 Raven.include("display/Raven.DisplayObject.js");
-Raven.include("display/Raven.Shape.js");
 Raven.include("display/Raven.Button.js");
+Raven.include("display/Raven.Shape.js");
 Raven.include("display/Raven.Scene.js");
 Raven.include("display/Raven.Stage.js");
 

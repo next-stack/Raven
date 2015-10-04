@@ -23,9 +23,9 @@ Raven.App = function(params) {
     // View instance
     this.view           = null;
     // if the dom element is visible within the page
-    this.viewable       = this.checkViewable();
+    this.viewable       = true;
     // if the app should check if it's in view
-    this.checkView      = true;
+    this.checkView      = false;
 
     if(params !== undefined) {
         var p = params;
@@ -87,9 +87,9 @@ Raven.App = function(params) {
 
 Raven.App.prototype = {
     maxWidth: function() {
-        if( this.view !== null && this.view.element !== undefined ) {
-            return this.view.element.parentNode === document.body ? document.body.clientWidth : this.view.element.parentNode.clientWidth;
-        }
+        // if( this.view !== null && this.view.element !== undefined ) {
+        //     return this.view.element.parentNode === document.body ? document.body.clientWidth : this.view.element.parentNode.clientWidth;
+        // }
         return window.innerWidth;
     },
     maxHeight: function() {
@@ -165,7 +165,7 @@ Raven.App.prototype = {
             }
 
             this.view.setup(viewElement);
-            this.viewable = Raven.viewable(this.view.element);
+            // this.viewable = Raven.viewable(this.view.element);
             // Resize view
             if(this.fullscreen) {
                 this.onResize(this.maxWidth(), this.maxHeight());
@@ -176,6 +176,8 @@ Raven.App.prototype = {
             // if(this.view.autoClear) this.view.clear();
             // Draw base
             //this.draw();
+
+            if(this.checkView) this.viewable = this.checkViewable();
         }
         // Enable events
         this.enable();
@@ -214,6 +216,9 @@ Raven.App.prototype = {
     },
     onScroll:    function(evt, x, y) {},
     evtHandler:  function(evt) {
+        var x, y;
+        var offset = new Raven.Rect()
+        if(this.view && this.view.element !== undefined) offset.mapToDiv( this.view.element );
         switch(evt.type) {
             case Raven.DOM.RESIZE:
                 if(this.view) this.viewable = Raven.viewable( this.view.element );
@@ -227,16 +232,22 @@ Raven.App.prototype = {
                 this.onKeyUp( Key.getKey(evt.keyCode) );
             break;
             case Raven.DOM.MOUSE_DOWN:
-                this.onTouchDown( 0, evt.x, evt.y );
-                Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.DOWN, evt.x, evt.y) );
+                x = evt.clientX * window.devicePixelRatio - offset.x;
+                y = evt.clientY * window.devicePixelRatio - offset.y;
+                this.onTouchDown( 0, x, y );
+                Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.DOWN, x, y) );
             break;
             case Raven.DOM.MOUSE_MOVE:
-                this.onTouchMove( 0, evt.x, evt.y );
-                Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.MOVE, evt.x, evt.y) );
+                x = evt.clientX * window.devicePixelRatio - offset.x;
+                y = evt.clientY * window.devicePixelRatio - offset.y;
+                this.onTouchMove( 0, x, y );
+                Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.MOVE, x, y) );
             break;
             case Raven.DOM.MOUSE_UP:
-                this.onTouchUp( 0, evt.x, evt.y );
-                Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.UP, evt.x, evt.y) );
+                x = evt.clientX * window.devicePixelRatio - offset.x;
+                y = evt.clientY * window.devicePixelRatio - offset.y;
+                this.onTouchUp( 0, x, y );
+                Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.UP, x, y) );
             break;
             case Raven.DOM.SCROLL:
                 this.viewable = this.viewable ? Raven.viewable( this.view.element ) : false;
@@ -254,8 +265,8 @@ Raven.App.prototype = {
             case Raven.DOM.TOUCH_DOWN:
                 var i, x, y, touches = evt.targetTouches, total = touches.length;
                 for(i = 0; i < total; ++i) {
-                    x = touches[i].clientX;
-                    y = touches[i].clientY;
+                    x = touches[i].clientX * window.devicePixelRatio - offset.x;
+                    y = touches[i].clientY * window.devicePixelRatio - offset.y;
                     this.onTouchDown( touches[i].identifier, x, y );
                     Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.DOWN, x, y, touches[i].identifier) );
                 }
@@ -264,9 +275,9 @@ Raven.App.prototype = {
             case Raven.DOM.TOUCH_MOVE:
                 var i, x, y, touches = evt.targetTouches, total = touches.length;
                 for(i = 0; i < total; ++i) {
-                    x = touches[i].clientX;
-                    y = touches[i].clientY;
-                    this.onTouchMove( touches[i].identifier, touches[i].clientX, touches[i].clientY );
+                    x = touches[i].clientX * window.devicePixelRatio - offset.x;
+                    y = touches[i].clientY * window.devicePixelRatio - offset.y;
+                    this.onTouchMove( touches[i].identifier, x, y );
                     Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.MOVE, x, y, touches[i].identifier) );
                 }
                 touches = null;
@@ -274,9 +285,9 @@ Raven.App.prototype = {
             case Raven.DOM.TOUCH_UP:
                 var i, x, y, touches = evt.targetTouches, total = touches.length;
                 for(i = 0; i < total; ++i) {
-                    x = touches[i].clientX;
-                    y = touches[i].clientY;
-                    this.onTouchUp( touches[i].identifier, touches[i].clientX, touches[i].clientY );
+                    x = touches[i].clientX * window.devicePixelRatio - offset.x;
+                    y = touches[i].clientY * window.devicePixelRatio - offset.y;
+                    this.onTouchUp( touches[i].identifier, x, y );
                     Raven.dispatchEvent( new Raven.ActionEvent(Raven.ActionEvent.UP, x, y, touches[i].identifier) );
                 }
                 touches = null;
